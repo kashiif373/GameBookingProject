@@ -1,0 +1,10 @@
+.booking-container {
+  padding: 40px;
+}
+
+.summary-card {
+  padding: 30px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0px 5px 20px rgba(0,0,0,0.1);
+}
