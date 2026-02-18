@@ -28,16 +28,13 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setMessage("");
     setError("");
 
     try {
       const response = await API.post("/Users/register", formData);
-
       setMessage(response.data.message);
 
-      // Clear form after success
       setFormData({
         name: "",
         email: "",
@@ -53,88 +50,99 @@ function Register() {
     }
   };
 
- return (
-  <div className="register-container">
+  // ✅ RETURN MUST BE INSIDE FUNCTION
+  return (
+    <div className="register-wrapper">
 
-    <h3 className="register-title">Create Account</h3>
-
-    {message && <div className="alert alert-success">{message}</div>}
-    {error && <div className="alert alert-danger">{error}</div>}
-
-    <form onSubmit={handleSubmit}>
-
-      <input
-        className="form-control mb-3"
-        name="name"
-        placeholder="👤 Full Name"
-        value={formData.name}
-        onChange={handleChange}
-        required
-      />
-
-      <input
-        className="form-control mb-3"
-        name="email"
-        placeholder="📧 Email Address"
-        type="email"
-        value={formData.email}
-        onChange={handleChange}
-        required
-      />
-
-      <input
-        className="form-control mb-3"
-        name="phone"
-        placeholder="📱 Phone Number"
-        value={formData.phone}
-        onChange={handleChange}
-        required
-      />
-
-      <input
-        className="form-control mb-3"
-        name="password"
-        placeholder="🔒 Password"
-        type="password"
-        value={formData.password}
-        onChange={handleChange}
-        required
-      />
-
-      <select
-        className="form-control mb-3"
-        name="selectedCity"
-        value={formData.selectedCity}
-        onChange={handleChange}
-        required
-      >
-        <option value="">🏙️ Select City</option>
-        <option value="Patna">Patna</option>
-        <option value="Aligarh">Aligarh</option>
-        <option value="Other">Other</option>
-      </select>
-
-      <div className="form-check mb-3">
-        <input
-          type="checkbox"
-          name="isGpsEnabled"
-          className="form-check-input"
-          checked={formData.isGpsEnabled}
-          onChange={handleChange}
-        />
-        <label className="form-check-label">
-          Use My Current Location (GPS)
-        </label>
+      <div className="register-left">
+        <h1 className="brand-title">Join Us Today 🚀</h1>
+        <p className="brand-subtitle">
+          Create your account and start managing everything in one secure place.
+        </p>
       </div>
 
-      <button className="btn register-btn">
-        Register Now
-      </button>
+      <div className="register-right">
+        <div className="register-card">
 
-    </form>
-  </div>
-);
+          <h3 className="register-title">Create Account</h3>
 
+          {message && <div className="alert success">{message}</div>}
+          {error && <div className="alert error">{error}</div>}
+
+          <form onSubmit={handleSubmit}>
+
+            <input
+              className="custom-input"
+              name="name"
+              placeholder="👤 Full Name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+
+            <input
+              className="custom-input"
+              name="email"
+              placeholder="📧 Email Address"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+
+            <input
+              className="custom-input"
+              name="phone"
+              placeholder="📱 Phone Number"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+            />
+
+            <input
+              className="custom-input"
+              name="password"
+              placeholder="🔒 Password"
+              type="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+
+            <select
+              className="custom-input"
+              name="selectedCity"
+              value={formData.selectedCity}
+              onChange={handleChange}
+              required
+            >
+              <option value="">🏙️ Select City</option>
+              <option value="Patna">Patna</option>
+              <option value="Aligarh">Aligarh</option>
+              <option value="Other">Other</option>
+            </select>
+
+            <div className="checkbox-wrapper">
+              <input
+                type="checkbox"
+                name="isGpsEnabled"
+                checked={formData.isGpsEnabled}
+                onChange={handleChange}
+              />
+              <label>Use My Current Location (GPS)</label>
+            </div>
+
+            <button className="register-btn">
+              Register Now
+            </button>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  );
 }
 
 export default Register;

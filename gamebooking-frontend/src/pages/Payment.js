@@ -9,48 +9,50 @@ function Payment() {
   const [message, setMessage] = useState("");
 
   const bookingId = localStorage.getItem("bookingId");
-  const totalAmount = localStorage.getItem("totalAmount"); // from booking page
+  const totalAmount = localStorage.getItem("totalAmount");
 
   const makePayment = async () => {
     try {
 
       const res = await API.post(`/Payments/${bookingId}`);
 
-      setMessage("Payment Successful!");
+      setMessage("✅ Payment Successful!");
 
-      // SAVE amount for success page
       localStorage.setItem("paymentAmount", totalAmount);
 
-      // Navigate to success page
       setTimeout(() => navigate("/payment-success"), 1500);
 
     } catch (error) {
       console.error(error);
-      setMessage("Payment failed. Please try again.");
+      setMessage("❌ Payment failed. Please try again.");
     }
   };
 
   return (
-    <div className="payment-container">
+    <div className="payment-wrapper">
 
       <div className="payment-card">
 
-        <h2>Complete Payment</h2>
+        <h2 className="payment-title">Complete Payment</h2>
 
-        <p className="mt-3">
-          Booking ID: <b>{bookingId}</b>
-        </p>
+        <div className="payment-details">
+          <p>
+            Booking ID
+            <span>{bookingId}</span>
+          </p>
 
-        <p>
-          Amount to Pay: <b>₹{totalAmount}</b>
-        </p>
+          <p>
+            Amount to Pay
+            <span>₹{totalAmount}</span>
+          </p>
+        </div>
 
-        <button className="btn btn-success mt-3" onClick={makePayment}>
+        <button className="payment-btn" onClick={makePayment}>
           Pay Now
         </button>
 
         {message && (
-          <div className="alert alert-info mt-4">
+          <div className="payment-message">
             {message}
           </div>
         )}

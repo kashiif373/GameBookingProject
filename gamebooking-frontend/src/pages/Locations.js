@@ -4,7 +4,6 @@ import "./Locations.css";
 import { useNavigate } from "react-router-dom";
 
 function Locations() {
-
   const navigate = useNavigate();
   const [locations, setLocations] = useState([]);
 
@@ -29,27 +28,42 @@ function Locations() {
   };
 
   return (
-    <div className="location-container">
+    <div className="food-container">
 
-      <h2 className="text-center mb-4">Select Location</h2>
+      {/* Hero Section (Same as Foods) */}
+      <div className="food-hero">
+        <h1>Select Location</h1>
+        <p>Choose your preferred gaming zone</p>
+      </div>
 
-      <div className="row">
-        {locations.map(loc => (
-          <div key={loc.locationId} className="col-md-4 mb-4">
+      <div className="row mt-5">
+        {locations.map((loc) => (
+          <div key={loc.locationId} className="col-lg-4 col-md-6 mb-5">
+            <div className="food-card">
 
-            <div className="location-card">
-              <h5>{loc.locationName}</h5>
-              <p>City: {loc.city}</p>
-              <p>Price: ₹{loc.pricePerHour}</p>
+              {/* Image Section */}
+              <div className="food-image">
+                <img
+                  src="/images/location-placeholder.jpg"
+                  alt={loc.locationName}
+                />
+              </div>
 
-              <button
-                className="btn btn-success location-btn"
-                onClick={() => selectLocation(loc.locationId)}
-              >
-                Select
-              </button>
+              {/* Details Section */}
+              <div className="food-details">
+                <h5>{loc.locationName}</h5>
+                <p><strong>City:</strong> {loc.city}</p>
+                <p className="price">₹ {loc.pricePerHour} / hour</p>
+
+                <button
+                  className="order-btn"
+                  onClick={() => selectLocation(loc.locationId)}
+                >
+                  Select Location →
+                </button>
+              </div>
+
             </div>
-
           </div>
         ))}
       </div>

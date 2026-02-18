@@ -18,47 +18,63 @@ namespace GameBookingAPI.Controllers
 
         // ================= REGISTER USER =================
         [HttpPost("register")]
-        public IActionResult Register(User user)
+        public IActionResult Register([FromBody] User user)
         {
-            // Eligibility Logic
+            // Basic validation
+            if (string.IsNullOrEmpty(user.Email) ||
+                string.IsNullOrEmpty(user.Password) ||
+                string.IsNullOrEmpty(user.Name))
+            {
+                return BadRequest("All required fields must be filled.");
+            }
+
+            // Check if email already exists
+            if (_context.Users.Any(u => u.Email == user.Email))
+            {
+                return BadRequest("Email already registered.");
+            }
+
+            // ================= Eligibility Logic =================
             if (user.IsGpsEnabled)
             {
-                if (user.DetectedCity == "Patna" || user.DetectedCity == "Aligarh")
-                    user.IsEligible = true;
-                else
-                    user.IsEligible = false;
+                user.IsEligible = (user.DetectedCity == "Patna" || user.DetectedCity == "Aligarh");
             }
             else
             {
-                if (user.SelectedCity == "Patna" || user.SelectedCity == "Aligarh")
-                    user.IsEligible = true;
-                else
-                    user.IsEligible = false;
+                user.IsEligible = (user.SelectedCity == "Patna" || user.SelectedCity == "Aligarh");
             }
 
-            user.IsVerified = false; // OTP verification later
+            // Default values
+            user.IsVerified = false;
 
-            _context.Users.Add(user);
-            _context.SaveChanges();
-
-            return Ok(new
+            try
             {
-                Message = "User registered successfully",
-                Eligible = user.IsEligible
-            });
+                _context.Users.Add(user);
+                _context.SaveChanges();
+
+                return Ok(new
+                {
+                    Message = "User registered successfully",
+                    Eligible = user.IsEligible
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Database error: " + ex.Message);
+            }
         }
 
 
         // ================= LOGIN USER =================
         [HttpPost("login")]
-        public IActionResult Login(string email, string password)
+        public IActionResult Login([FromBody] LoginRequest model)
         {
             var user = _context.Users
-                .FirstOrDefault(u => u.Email == email && u.Password == password);
+                .FirstOrDefault(u => u.Email == model.Email && u.Password == model.Password);
 
             if (user == null)
             {
-                return Unauthorized("Invalid email or password");
+                return Unauthorized("Invalid email or password.");
             }
 
             return Ok(new
@@ -69,5 +85,12 @@ namespace GameBookingAPI.Controllers
                 IsEligible = user.IsEligible
             });
         }
+    }
+
+    // DTO for Login
+    public class LoginRequest
+    {
+        public string Email { get; set; }
+        public string Password { get; set; }
     }
 }

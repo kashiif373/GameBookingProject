@@ -1,59 +1,158 @@
-/* Page Background */
+/* ===== PAGE BACKGROUND ===== */
 body {
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
   height: 100vh;
 }
 
-/* Card Container */
-.register-container {
-  max-width: 450px;
-  margin: 80px auto;
-  padding: 40px;
-  border-radius: 15px;
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0px 15px 40px rgba(0,0,0,0.2);
-  backdrop-filter: blur(10px);
+/* ===== WRAPPER ===== */
+.register-wrapper {
+  display: flex;
+  height: 100vh;
 }
 
-/* Title */
+/* ===== LEFT PANEL ===== */
+.register-left {
+  flex: 1;
+  background: linear-gradient(160deg, #1e3c72, #2a5298);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px;
+}
+
+.brand-title {
+  font-size: 48px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.brand-subtitle {
+  font-size: 20px;
+  opacity: 0.9;
+  max-width: 420px;
+  line-height: 1.6;
+}
+
+/* ===== RIGHT PANEL ===== */
+.register-right {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===== REGISTER CARD ===== */
+.register-card {
+  width: 100%;
+  max-width: 480px;
+  padding: 50px 45px;
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+}
+
+/* ===== TITLE ===== */
 .register-title {
   text-align: center;
+  font-size: 30px;
+  font-weight: 600;
   margin-bottom: 30px;
-  font-weight: 700;
-  color: #333;
+  color: #ffffff;
 }
 
-/* Inputs */
-.form-control {
-  height: 45px;
+/* ===== ALERT ===== */
+.alert {
+  padding: 12px;
   border-radius: 10px;
-  border: 1px solid #ddd;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 15px;
+  color: white;
+}
+
+.alert.success {
+  background: rgba(0, 255, 150, 0.2);
+}
+
+.alert.error {
+  background: rgba(255, 0, 80, 0.2);
+}
+
+/* ===== INPUT FIELDS ===== */
+.custom-input {
+  width: 100%;
+  height: 55px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  border: none;
+  padding-left: 15px;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.9);
   transition: 0.3s;
 }
 
-.form-control:focus {
-  border-color: #4facfe;
-  box-shadow: 0 0 8px rgba(79,172,254,0.5);
+.custom-input:focus {
+  outline: none;
+  box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
+  transform: scale(1.02);
 }
 
-/* Button */
+/* ===== SELECT FIX ===== */
+select.custom-input {
+  cursor: pointer;
+}
+
+/* ===== CHECKBOX ===== */
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  color: white;
+  font-size: 14px;
+}
+
+/* ===== BUTTON ===== */
 .register-btn {
   width: 100%;
-  height: 45px;
-  border-radius: 10px;
-  font-weight: bold;
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  height: 55px;
+  border-radius: 12px;
   border: none;
+  font-size: 18px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: white;
+  cursor: pointer;
   transition: 0.3s;
 }
 
 .register-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0px 8px 20px rgba(0,0,0,0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 114, 255, 0.5);
 }
 
-/* Checkbox label */
-.form-check-label {
-  font-weight: 500;
-  color: #444;
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .register-wrapper {
+    flex-direction: column;
+  }
+
+  .register-left {
+    padding: 40px;
+    text-align: center;
+  }
+
+  .brand-title {
+    font-size: 32px;
+  }
+
+  .brand-subtitle {
+    font-size: 16px;
+  }
 }

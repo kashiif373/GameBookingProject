@@ -25,57 +25,80 @@ function Login() {
     e.preventDefault();
 
     try {
-      const res = await API.post(
-        `/Users/login?email=${formData.email}&password=${formData.password}`
-      );
+      const res = await API.post("/Users/login", {
+        email: formData.email,
+        password: formData.password
+      });
 
       localStorage.setItem("userId", res.data.userId);
       localStorage.setItem("isEligible", res.data.isEligible);
 
-      setMessage("Login successful");
+      setMessage("Login successful 🎉");
 
-      // Navigate to dashboard later
       setTimeout(() => navigate("/dashboard"), 1000);
 
-    } catch {
-      setMessage("Invalid credentials");
+    } catch (error) {
+      setMessage("Invalid credentials ❌");
     }
   };
 
   return (
-    <div className="login-container">
+  <div className="login-wrapper">
 
-      <h3 className="login-title">User Login</h3>
-
-      {message && <div className="alert alert-info">{message}</div>}
-
-      <form onSubmit={handleLogin}>
-
-        <input
-          className="form-control mb-3"
-          placeholder="Email"
-          name="email"
-          onChange={handleChange}
-        />
-
-        <input
-          className="form-control mb-3"
-          type="password"
-          placeholder="Password"
-          name="password"
-          onChange={handleChange}
-        />
-
-        <button className="btn login-btn">Login</button>
-
-      </form>
-
-      <p className="text-center mt-3">
-        Don't have an account? <Link to="/register">Register</Link>
+    {/* LEFT SIDE BRAND PANEL */}
+    <div className="login-left">
+      <h1 className="brand-title">Welcome Back 👋</h1>
+      <p className="brand-subtitle">
+        Secure login to access your dashboard and manage your account.
       </p>
-
     </div>
-  );
+
+    {/* RIGHT SIDE LOGIN FORM */}
+    <div className="login-right">
+      <div className="login-card">
+
+        <h3 className="login-title">User Login</h3>
+
+        {message && (
+          <div className="alert-box">
+            {message}
+          </div>
+        )}
+
+        <form onSubmit={handleLogin}>
+
+          <input
+            className="custom-input"
+            placeholder="Enter Email"
+            name="email"
+            onChange={handleChange}
+            required
+          />
+
+          <input
+            className="custom-input"
+            type="password"
+            placeholder="Enter Password"
+            name="password"
+            onChange={handleChange}
+            required
+          />
+
+          <button className="login-btn">Login</button>
+
+        </form>
+
+        <p className="register-text">
+          Don't have an account?
+          <Link to="/register" className="register-link"> Register</Link>
+        </p>
+
+      </div>
+    </div>
+
+  </div>
+);
+
 }
 
 export default Login;

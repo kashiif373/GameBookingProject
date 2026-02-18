@@ -27,23 +27,38 @@ function Dashboard() {
   };
 
   return (
-    <div className="dashboard-container">
+    <div className="food-container">
 
-      <h2 className="text-center mb-4">Select a Game</h2>
+      {/* Hero Section (Same Style) */}
+      <div className="food-hero">
+        <h1>Select Your Game</h1>
+        <p>Choose your favorite game and start booking</p>
+      </div>
 
-      <div className="row">
+      <div className="row mt-5">
         {games.map((game) => (
-          <div key={game.gameId} className="col-md-4 mb-4">
-            <div className="game-card">
+          <div key={game.gameId} className="col-lg-4 col-md-6 mb-5">
+            <div className="food-card">
 
-              <h4>{game.gameName}</h4>
+              {/* Image Section (Manual Image Add Here) */}
+              <div className="food-image">
+                <img
+                  src="/images/game-placeholder.jpg"
+                  alt={game.gameName}
+                />
+              </div>
 
-              <button
-                className="btn btn-primary game-btn"
-                onClick={() => selectGame(game.gameId)}
-              >
-                Book Now
-              </button>
+              {/* Game Details */}
+              <div className="food-details">
+                <h5>{game.gameName}</h5>
+
+                <button
+                  className="order-btn"
+                  onClick={() => selectGame(game.gameId)}
+                >
+                  Book Now →
+                </button>
+              </div>
 
             </div>
           </div>

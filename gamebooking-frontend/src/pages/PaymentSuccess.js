@@ -13,23 +13,38 @@ function PaymentSuccess() {
   };
 
   return (
-    <div className="payment-container">
+    <div className="success-wrapper">
 
-      <div className="payment-card">
+      <div className="success-card">
 
-        <div className="success-icon">✔</div>
-
-        <h2>Payment Successful</h2>
-
-        <p>Your booking has been confirmed.</p>
-
-        <div className="payment-details">
-          <p><strong>Booking ID:</strong> {bookingId}</p>
-          <p><strong>Amount Paid:</strong> ₹{amount}</p>
-          <p className="status">Status: PAID</p>
+        <div className="success-circle">
+          ✓
         </div>
 
-        <button className="btn-dashboard" onClick={goDashboard}>
+        <h2 className="success-title">Payment Successful</h2>
+
+        <p className="success-subtitle">
+          Your booking has been confirmed successfully.
+        </p>
+
+        <div className="success-details">
+          <div>
+            <span>Booking ID</span>
+            <strong>{bookingId}</strong>
+          </div>
+
+          <div>
+            <span>Amount Paid</span>
+            <strong>₹{amount}</strong>
+          </div>
+
+          <div>
+            <span>Status</span>
+            <strong className="paid-status">PAID</strong>
+          </div>
+        </div>
+
+        <button className="dashboard-btn" onClick={goDashboard}>
           Go to Dashboard
         </button>
 
