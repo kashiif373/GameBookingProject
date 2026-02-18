@@ -1,0 +1,16 @@
+.food-container {
+  padding: 40px;
+}
+
+.food-card {
+  padding: 20px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0px 5px 20px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.food-input {
+  width: 70px;
+  margin: auto;
+}
