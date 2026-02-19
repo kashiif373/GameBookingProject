@@ -1,16 +1,21 @@
-/* ===== PAGE BACKGROUND ===== */
-body {
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
   margin: 0;
   padding: 0;
   font-family: "Poppins", "Segoe UI", sans-serif;
   background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-  height: 100vh;
+  min-height: 100vh;
 }
 
 /* ===== WRAPPER ===== */
 .register-wrapper {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
+  width: 100%;
 }
 
 /* ===== LEFT PANEL ===== */
@@ -43,13 +48,14 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 40px;
 }
 
 /* ===== REGISTER CARD ===== */
 .register-card {
   width: 100%;
   max-width: 480px;
-  padding: 50px 45px;
+  padding: 45px 40px;
   border-radius: 25px;
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(18px);
@@ -60,7 +66,7 @@ body {
 /* ===== TITLE ===== */
 .register-title {
   text-align: center;
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 600;
   margin-bottom: 30px;
   color: #ffffff;
@@ -72,7 +78,7 @@ body {
   border-radius: 10px;
   margin-bottom: 20px;
   text-align: center;
-  font-size: 15px;
+  font-size: 14px;
   color: white;
 }
 
@@ -84,23 +90,22 @@ body {
   background: rgba(255, 0, 80, 0.2);
 }
 
-/* ===== INPUT FIELDS ===== */
+/* ===== INPUT ===== */
 .custom-input {
   width: 100%;
-  height: 55px;
-  margin-bottom: 18px;
+  height: 52px;
+  margin-bottom: 16px;
   border-radius: 12px;
   border: none;
-  padding-left: 15px;
-  font-size: 16px;
-  background: rgba(255, 255, 255, 0.9);
-  transition: 0.3s;
+  padding: 0 15px;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.95);
+  transition: 0.3s ease;
 }
 
 .custom-input:focus {
   outline: none;
   box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
-  transform: scale(1.02);
 }
 
 /* ===== SELECT FIX ===== */
@@ -121,38 +126,99 @@ select.custom-input {
 /* ===== BUTTON ===== */
 .register-btn {
   width: 100%;
-  height: 55px;
+  height: 52px;
   border-radius: 12px;
   border: none;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   background: linear-gradient(135deg, #00c6ff, #0072ff);
   color: white;
   cursor: pointer;
-  transition: 0.3s;
+  transition: 0.3s ease;
 }
 
 .register-btn:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(0, 114, 255, 0.5);
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== BACK BUTTON ===== */
+.back-btn {
+  width: 100%;
+  height: 50px;
+  margin-top: 12px;
+  border-radius: 12px;
+  border: 2px solid #4facfe;
+  background: transparent;
+  color: #4facfe;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.back-btn:hover {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+}
+
+/* ============================= */
+/* ===== RESPONSIVE DESIGN ===== */
+/* ============================= */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .brand-title {
+    font-size: 38px;
+  }
+
+  .brand-subtitle {
+    font-size: 18px;
+  }
+}
+
+/* Mobile */
 @media (max-width: 900px) {
   .register-wrapper {
     flex-direction: column;
   }
 
   .register-left {
-    padding: 40px;
+    padding: 50px 30px;
     text-align: center;
   }
 
+  .register-right {
+    padding: 30px 20px;
+  }
+
   .brand-title {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .brand-subtitle {
     font-size: 16px;
+  }
+
+  .register-card {
+    padding: 35px 25px;
+  }
+}
+
+/* Small Phones */
+@media (max-width: 480px) {
+  .register-card {
+    padding: 25px 20px;
+  }
+
+  .custom-input {
+    height: 48px;
+    font-size: 14px;
+  }
+
+  .register-btn,
+  .back-btn {
+    height: 48px;
+    font-size: 14px;
   }
 }
