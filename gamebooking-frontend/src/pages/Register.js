@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import "./Register.css";
 
 function Register() {
+
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -50,7 +53,10 @@ function Register() {
     }
   };
 
-  // ✅ RETURN MUST BE INSIDE FUNCTION
+  const goToLogin = () => {
+    navigate("/");
+  };
+
   return (
     <div className="register-wrapper">
 
@@ -132,8 +138,16 @@ function Register() {
               <label>Use My Current Location (GPS)</label>
             </div>
 
-            <button className="register-btn">
+            <button type="submit" className="register-btn">
               Register Now
+            </button>
+
+            <button 
+              type="button" 
+              className="back-btn"
+              onClick={goToLogin}
+            >
+              ← Back to Login
             </button>
 
           </form>
