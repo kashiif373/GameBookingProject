@@ -2,6 +2,10 @@
 using GameBookingAPI.Data;
 using GameBookingAPI.Models;
 using System.Linq;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace GameBookingAPI.Controllers
 {
@@ -10,12 +14,15 @@ namespace GameBookingAPI.Controllers
     public class UsersController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IConfiguration _config;
 
-        public UsersController(AppDbContext context)
+        public UsersController(AppDbContext context, IConfiguration config)
         {
             _context = context;
+            _config = config;
         }
 
+        // ================= REGISTER =================
         [HttpPost("register")]
         public IActionResult Register([FromBody] User user)
         {
@@ -37,6 +44,7 @@ namespace GameBookingAPI.Controllers
             return Ok("User registered successfully.");
         }
 
+        // ================= LOGIN =================
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest model)
         {
@@ -48,10 +56,59 @@ namespace GameBookingAPI.Controllers
                 return Unauthorized("Invalid email or password.");
             }
 
-            return Ok("Login successful");
+            var token = GenerateJwtToken(user);
+
+            return Ok(new
+            {
+                token = token,
+                name = user.Name,
+                email = user.Email,
+                userId = user.UserId.ToString()
+            });
+        }
+
+        // ================= LOGOUT =================
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            // For JWT-based authentication, logout is handled on client side
+            // by removing the token from localStorage/sessionStorage.
+            // The server just returns a success message.
+            return Ok(new { message = "Logout successful" });
+        }
+
+        // ================= TOKEN GENERATOR =================
+        private string GenerateJwtToken(User user)
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
+            };
+
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_config["Jwt:Key"])
+            );
+
+            var creds = new SigningCredentials(
+                key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(
+                    Convert.ToDouble(_config["Jwt:DurationInMinutes"])
+                ),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 
+    // ================= LOGIN REQUEST MODEL =================
     public class LoginRequest
     {
         public string Email { get; set; }

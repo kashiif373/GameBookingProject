@@ -30,8 +30,16 @@ function Login() {
         password: formData.password
       });
 
-      localStorage.setItem("userId", res.data.userId);
-      localStorage.setItem("isEligible", res.data.isEligible);
+      // ⭐ STORE JWT TOKEN
+      localStorage.setItem("token", res.data.token);
+
+      // Store user info
+      localStorage.setItem("userName", res.data.name);
+      localStorage.setItem("userEmail", res.data.email);
+      
+        if (res.data.userId) {
+          localStorage.setItem("userId", res.data.userId);
+        }
 
       setMessage("Login successful 🎉");
 
@@ -43,62 +51,59 @@ function Login() {
   };
 
   return (
-  <div className="login-wrapper">
+    <div className="login-wrapper">
 
-    {/* LEFT SIDE BRAND PANEL */}
-    <div className="login-left">
-      <h1 className="brand-title">Welcome Back 👋</h1>
-      <p className="brand-subtitle">
-        Secure login to access your dashboard and manage your account.
-      </p>
-    </div>
-
-    {/* RIGHT SIDE LOGIN FORM */}
-    <div className="login-right">
-      <div className="login-card">
-
-        <h3 className="login-title">User Login</h3>
-
-        {message && (
-          <div className="alert-box">
-            {message}
-          </div>
-        )}
-
-        <form onSubmit={handleLogin}>
-
-          <input
-            className="custom-input"
-            placeholder="Enter Email"
-            name="email"
-            onChange={handleChange}
-            required
-          />
-
-          <input
-            className="custom-input"
-            type="password"
-            placeholder="Enter Password"
-            name="password"
-            onChange={handleChange}
-            required
-          />
-
-          <button className="login-btn">Login</button>
-
-        </form>
-
-        <p className="register-text">
-          Don't have an account?
-          <Link to="/register" className="register-link"> Register</Link>
+      <div className="login-left">
+        <h1 className="brand-title">Welcome Back 👋</h1>
+        <p className="brand-subtitle">
+          Secure login to access your dashboard and manage your account.
         </p>
-
       </div>
+
+      <div className="login-right">
+        <div className="login-card">
+
+          <h3 className="login-title">User Login</h3>
+
+          {message && (
+            <div className="alert-box">
+              {message}
+            </div>
+          )}
+
+          <form onSubmit={handleLogin}>
+
+            <input
+              className="custom-input"
+              placeholder="Enter Email"
+              name="email"
+              onChange={handleChange}
+              required
+            />
+
+            <input
+              className="custom-input"
+              type="password"
+              placeholder="Enter Password"
+              name="password"
+              onChange={handleChange}
+              required
+            />
+
+            <button className="login-btn">Login</button>
+
+          </form>
+
+          <p className="register-text">
+            Don't have an account?
+            <Link to="/register" className="register-link"> Register</Link>
+          </p>
+
+        </div>
+      </div>
+
     </div>
-
-  </div>
-);
-
+  );
 }
 
 export default Login;

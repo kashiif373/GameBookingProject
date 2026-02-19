@@ -36,6 +36,30 @@
   color: #ff9966;
 }
 
+/* ===== USER WELCOME & LOGOUT BUTTON ===== */
+.user-welcome {
+  margin-left: 20px;
+  color: #ff9966;
+  font-weight: 500;
+}
+
+.nav-links .logout-btn {
+  margin-left: 20px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(45deg, #ff512f, #dd2476);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.nav-links .logout-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+}
+
 /* ===== HERO SECTION ===== */
 .hero {
   height: 70vh;

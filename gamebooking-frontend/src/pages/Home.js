@@ -1,9 +1,31 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { logout, isAuthenticated, getUserInfo } from "../services/api";
 import "./Home.css";
 
 function Home() {
   const navigate = useNavigate();
+  const [authenticated, setAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Check authentication status on mount
+    const checkAuth = () => {
+      const isAuth = isAuthenticated();
+      setAuthenticated(isAuth);
+      if (isAuth) {
+        setUser(getUserInfo());
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setAuthenticated(false);
+    setUser(null);
+    navigate("/");
+  };
 
   return (
     <div className="home-page">
@@ -15,7 +37,15 @@ function Home() {
         <div className="nav-links">
           <button onClick={() => navigate("/")}>Home</button>
           <button onClick={() => navigate("/dashboard")}>Games</button>
-          <button onClick={() => navigate("/login")}>Login</button>
+
+          {authenticated && user ? (
+            <>
+              <span className="user-welcome">Hello, {user.name}!</span>
+              <button onClick={handleLogout} className="logout-btn">Logout</button>
+            </>
+          ) : (
+            <button onClick={() => navigate("/login")}>Login</button>
+          )}
         </div>
       </nav>
 
