@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API from "../services/api";
+import { logout, isAuthenticated, getUserInfo } from "../services/api";
 import "./Foods.css";
 import { useNavigate } from "react-router-dom";
 
@@ -13,10 +14,22 @@ function Foods() {
   const navigate = useNavigate();
   const [foods, setFoods] = useState([]);
   const [selectedFoods, setSelectedFoods] = useState({});
-useEffect(() => {
-  window.scrollTo(0, 0);   // ⭐ THIS LINE FIXES EVERYTHING
-  fetchFoods();
-}, []);
+  const [user, setUser] = useState(null);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchFoods();
+    checkAuth();
+  }, []);
+
+  const checkAuth = () => {
+    const auth = isAuthenticated();
+    setAuthenticated(auth);
+    if (auth) {
+      setUser(getUserInfo());
+    }
+  };
 
   const fetchFoods = async () => {
     try {
@@ -35,15 +48,16 @@ useEffect(() => {
   };
 
   const proceedBooking = () => {
-    const hasSelected = Object.values(selectedFoods).some(qty => qty > 0);
-
-    if (!hasSelected) {
-      alert("Please select at least one food item");
-      return;
-    }
-
+    // Save foods even if none selected
     localStorage.setItem("selectedFoods", JSON.stringify(selectedFoods));
     navigate("/booking");
+  };
+
+  const handleLogout = () => {
+    logout();
+    setAuthenticated(false);
+    setUser(null);
+    navigate("/");
   };
 
   const getFoodImage = (name) => {
@@ -57,9 +71,28 @@ useEffect(() => {
   };
 
   return (
-    <div className="food-page">
+    <div className="foods-page">
 
-      <div className="container">
+      {/* ===== NAVBAR ===== */}
+      <nav className="navbar">
+        <div className="nav-logo">Playeato</div>
+
+        <div className="nav-links">
+          <button onClick={() => navigate("/")}>Home</button>
+          <button onClick={() => navigate("/dashboard")}>Games</button>
+
+          {authenticated && user ? (
+            <>
+              <span className="user-welcome">Hello, {user.name}!</span>
+              <button onClick={handleLogout} className="logout-btn">Logout</button>
+            </>
+          ) : (
+            <button onClick={() => navigate("/login")}>Login</button>
+          )}
+        </div>
+      </nav>
+
+      <div className="foods-content">
 
         {/* HERO */}
         <div className="hero-section">
@@ -67,9 +100,8 @@ useEffect(() => {
           <p>Enhance your booking with tasty food & beverages</p>
         </div>
 
-        {/* CARDS GRID */}
+        {/* FOOD CARDS */}
         <div className="row gx-4 gy-4 mt-4">
-
           {foods.map((food) => (
             <div key={food.foodId} className="col-lg-4 col-md-6">
               <div className="food-card">
@@ -94,7 +126,7 @@ useEffect(() => {
           ))}
         </div>
 
-        {/* BUTTON */}
+        {/* PROCEED BUTTON */}
         <div className="text-center mt-5">
           <button className="premium-btn" onClick={proceedBooking}>
             Proceed to Booking →
@@ -102,6 +134,13 @@ useEffect(() => {
         </div>
 
       </div>
+
+      {/* ===== FOOTER ===== */}
+      <footer className="footer">
+        <p>© 2026 GameZone Booking System</p>
+        <p>All rights reserved.</p>
+      </footer>
+
     </div>
   );
 }

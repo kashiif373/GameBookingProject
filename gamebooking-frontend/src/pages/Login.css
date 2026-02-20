@@ -1,11 +1,20 @@
-/* ===== FULL PAGE WRAPPER (FIXED VERSION) ===== */
+/* ===== PAGE BACKGROUND ===== */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
 .login-wrapper {
   display: flex;
-  min-height: 100vh;   /* ✅ FIX: use min-height instead of height */
+  flex: 1;
   margin: 0;
   padding: 0;
   font-family: "Poppins", "Segoe UI", sans-serif;
   background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  min-height: calc(100vh - 120px);
+  overflow-x: hidden;
 }
 
 /* ===== LEFT PANEL ===== */
@@ -16,19 +25,19 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 80px;
+  padding: 60px 80px;
 }
 
 .brand-title {
-  font-size: 48px;
+  font-size: 42px;
   font-weight: 700;
   margin-bottom: 20px;
 }
 
 .brand-subtitle {
-  font-size: 20px;
+  font-size: 18px;
   opacity: 0.9;
-  max-width: 400px;
+  max-width: 380px;
   line-height: 1.6;
 }
 
@@ -38,14 +47,15 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
 }
 
 /* ===== LOGIN CARD ===== */
 .login-card {
   width: 100%;
-  max-width: 450px;
-  padding: 50px 45px;
-  border-radius: 25px;
+  max-width: 400px;
+  padding: 35px 30px;
+  border-radius: 20px;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(18px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -55,9 +65,9 @@
 /* ===== TITLE ===== */
 .login-title {
   text-align: center;
-  font-size: 30px;
+  font-size: 26px;
   font-weight: 600;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
   color: #ffffff;
 }
 
@@ -66,23 +76,42 @@
   background: rgba(255, 255, 255, 0.2);
   padding: 12px;
   border-radius: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   text-align: center;
   color: white;
-  font-size: 16px;
+  font-size: 14px;
+}
+
+/* ===== ALERT ===== */
+.alert {
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 18px;
+  text-align: center;
+  font-size: 14px;
+  color: white;
+}
+
+.alert.success {
+  background: rgba(0, 255, 150, 0.2);
+}
+
+.alert.error {
+  background: rgba(255, 0, 80, 0.2);
 }
 
 /* ===== INPUT FIELDS ===== */
 .custom-input {
   width: 100%;
-  height: 55px;
-  margin-bottom: 20px;
-  border-radius: 12px;
+  height: 48px;
+  margin-bottom: 14px;
+  border-radius: 10px;
   border: none;
   padding-left: 15px;
-  font-size: 16px;
+  font-size: 15px;
   background: rgba(255, 255, 255, 0.9);
   transition: 0.3s;
+  box-sizing: border-box;
 }
 
 .custom-input:focus {
@@ -94,15 +123,16 @@
 /* ===== BUTTON ===== */
 .login-btn {
   width: 100%;
-  height: 55px;
-  border-radius: 12px;
+  height: 48px;
+  border-radius: 10px;
   border: none;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   background: linear-gradient(135deg, #00c6ff, #0072ff);
   color: white;
   cursor: pointer;
   transition: 0.3s;
+  margin-top: 5px;
 }
 
 .login-btn:hover {
@@ -110,12 +140,12 @@
   box-shadow: 0 10px 25px rgba(0, 114, 255, 0.5);
 }
 
-/* ===== REGISTER ===== */
+
 .register-text {
-  margin-top: 20px;
+  margin-top: 18px;
   text-align: center;
   color: white;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .register-link {
@@ -135,15 +165,25 @@
   }
 
   .login-left {
-    padding: 40px;
+    padding: 30px 20px;
     text-align: center;
+    align-items: center;
   }
 
   .brand-title {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .brand-subtitle {
-    font-size: 16px;
+    font-size: 15px;
+    max-width: 100%;
+  }
+
+  .login-right {
+    padding: 20px 15px;
+  }
+
+  .login-card {
+    padding: 25px 20px;
   }
 }

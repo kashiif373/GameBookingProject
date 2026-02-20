@@ -20,38 +20,57 @@ namespace GameBookingAPI.Controllers
         [HttpPost]
         public IActionResult CreateBooking(Booking booking)
         {
-            // Get user
             var user = _context.Users.FirstOrDefault(u => u.UserId == booking.UserId);
 
             if (user == null)
                 return BadRequest("User not found");
 
-            // Check eligibility
-            if (!user.IsEligible)
-                return BadRequest("Booking not allowed for your location");
-
-            // Save booking
             booking.PaymentStatus = "Pending";
 
             _context.Bookings.Add(booking);
             _context.SaveChanges();
 
-            return Ok(new
-            {
-                Message = "Booking created successfully",
-                BookingId = booking.BookingId
-            });
+            return Ok(new { BookingId = booking.BookingId });
         }
 
-        // GET BOOKINGS BY USER
-        [HttpGet("user/{userId}")]
-        public IActionResult GetUserBookings(int userId)
+        // ⭐ NEW HISTORY API
+        [HttpGet("history/{userId}")]
+        public IActionResult GetBookingHistory(int userId)
         {
-            var bookings = _context.Bookings
+            var history = _context.Bookings
                 .Where(b => b.UserId == userId)
+                .Select(b => new BookingHistoryDTO
+                {
+                    BookingId = b.BookingId,
+                    GameName = _context.Games
+                        .Where(g => g.GameId == b.GameId)
+                        .Select(g => g.GameName)
+                        .FirstOrDefault(),
+
+                    LocationName = _context.Locations
+                        .Where(l => l.LocationId == b.LocationId)
+                        .Select(l => l.LocationName)
+                        .FirstOrDefault(),
+
+                    BookingDate = b.BookingDate,
+                    TimeSlot = b.TimeSlot,
+                    TotalAmount = b.TotalAmount,
+                    PaymentStatus = b.PaymentStatus,
+
+                    Foods = _context.BookingFoods
+                        .Where(bf => bf.BookingId == b.BookingId)
+                        .Select(bf => new FoodDTO
+                        {
+                            FoodName = _context.Foods
+                                .Where(f => f.FoodId == bf.FoodId)
+                                .Select(f => f.FoodName)
+                                .FirstOrDefault(),
+                            Quantity = bf.Quantity
+                        }).ToList()
+                })
                 .ToList();
 
-            return Ok(bookings);
+            return Ok(history);
         }
     }
 }

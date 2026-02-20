@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API from "../services/api";
+import { logout, isAuthenticated, getUserInfo } from "../services/api";
 import "./Locations.css";
 import { useNavigate } from "react-router-dom";
 
@@ -13,13 +14,24 @@ import aligarhttcenter from "../images/aligargttcenter.jpg";
 function Locations() {
   const navigate = useNavigate();
   const [locations, setLocations] = useState([]);
+  const [user, setUser] = useState(null);
+  const [authenticated, setAuthenticated] = useState(false);
 
   const gameId = localStorage.getItem("gameId");
 
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchLocations();
+    checkAuth();
   }, []);
+
+  const checkAuth = () => {
+    const auth = isAuthenticated();
+    setAuthenticated(auth);
+    if (auth) {
+      setUser(getUserInfo());
+    }
+  };
 
   const fetchLocations = async () => {
     try {
@@ -35,7 +47,14 @@ function Locations() {
     navigate("/foods");
   };
 
-  // ⭐ Image Mapping Function
+  const handleLogout = () => {
+    logout();
+    setAuthenticated(false);
+    setUser(null);
+    navigate("/");
+  };
+
+  // Image Mapping Function
   const getLocationImage = (name) => {
     const lower = name.toLowerCase();
 
@@ -50,9 +69,28 @@ function Locations() {
   };
 
   return (
-    <div className="food-page">
+    <div className="locations-page">
 
-      <div className="container">
+      {/* ===== NAVBAR ===== */}
+      <nav className="navbar">
+        <div className="nav-logo">Playeato</div>
+
+        <div className="nav-links">
+          <button onClick={() => navigate("/")}>Home</button>
+          <button onClick={() => navigate("/dashboard")}>Games</button>
+
+          {authenticated && user ? (
+            <>
+              <span className="user-welcome">Hello, {user.name}!</span>
+              <button onClick={handleLogout} className="logout-btn">Logout</button>
+            </>
+          ) : (
+            <button onClick={() => navigate("/login")}>Login</button>
+          )}
+        </div>
+      </nav>
+
+      <div className="locations-content">
 
         {/* HERO */}
         <div className="hero-section">
@@ -94,6 +132,13 @@ function Locations() {
         </div>
 
       </div>
+
+      {/* ===== FOOTER ===== */}
+      <footer className="footer">
+        <p>© 2026 GameZone Booking System</p>
+        <p>All rights reserved.</p>
+      </footer>
+
     </div>
   );
 }

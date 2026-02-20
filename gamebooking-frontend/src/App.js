@@ -6,6 +6,8 @@ import Dashboard from "./pages/Dashboard";
 import Locations from "./pages/Locations";
 import Foods from "./pages/Foods";
 import Booking from "./pages/Booking";
+import BookingHistory from "./pages/BookingHistory";
+
 import Payment from "./pages/Payment";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -27,6 +29,8 @@ function App() {
         <Route path="/locations" element={<Locations />} />
         <Route path="/foods" element={<Foods />} />
         <Route path="/booking" element={<Booking />} />
+        <Route path="/history" element={<BookingHistory />} />
+
         <Route path="/payment" element={<Payment />} />
 
       </Routes>

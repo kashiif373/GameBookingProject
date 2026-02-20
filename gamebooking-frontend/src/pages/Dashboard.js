@@ -13,11 +13,13 @@ function Dashboard() {
   const navigate = useNavigate();
   const [games, setGames] = useState([]);
   const [user, setUser] = useState(null);
+  const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
     // Check authentication and get user info
     const checkAuth = () => {
       const auth = isAuthenticated();
+      setAuthenticated(auth);
       if (!auth) {
         // Not logged in, redirect to login
         navigate("/login");
@@ -46,10 +48,12 @@ function Dashboard() {
 
   const handleLogout = () => {
     logout();
+    setAuthenticated(false);
+    setUser(null);
     navigate("/");
   };
 
-  // ⭐ Image Mapping Function
+  // Image Mapping Function
   const getGameImage = (name) => {
     const lower = name.toLowerCase();
 
@@ -62,17 +66,28 @@ function Dashboard() {
   };
 
   return (
-    <div className="food-page">
+    <div className="dashboard-page">
 
-      <div className="container">
+      {/* ===== NAVBAR ===== */}
+      <nav className="navbar">
+        <div className="nav-logo" onClick={() => navigate("/")}>Playeato</div>
 
-        {/* USER INFO BAR */}
-        {user && (
-          <div className="user-info-bar">
-            <span>Welcome, {user.name}!</span>
-            <button onClick={handleLogout} className="logout-btn">Logout</button>
-          </div>
-        )}
+        <div className="nav-links">
+          <button onClick={() => navigate("/")}>Home</button>
+          <button onClick={() => navigate("/dashboard")}>Games</button>
+
+          {authenticated && user ? (
+            <>
+              <span className="user-welcome">Hello, {user.name}!</span>
+              <button onClick={handleLogout} className="logout-btn">Logout</button>
+            </>
+          ) : (
+            <button onClick={() => navigate("/login")}>Login</button>
+          )}
+        </div>
+      </nav>
+
+      <div className="dashboard-content">
 
         {/* HERO */}
         <div className="hero-section">
@@ -82,7 +97,9 @@ function Dashboard() {
 
         {/* GRID */}
         <div className="row g-4">
-          {games.map((game) => (
+          {games
+            .filter((game) => !game.gameName.toLowerCase().includes("badminton"))
+            .map((game) => (
             <div key={game.gameId} className="col-xl-3 col-lg-4 col-md-6">
               <div className="food-card">
 
@@ -112,6 +129,13 @@ function Dashboard() {
         </div>
 
       </div>
+
+      {/* ===== FOOTER ===== */}
+      <footer className="footer">
+        <p>© 2026 GameZone Booking System</p>
+        <p>All rights reserved.</p>
+      </footer>
+
     </div>
   );
 }

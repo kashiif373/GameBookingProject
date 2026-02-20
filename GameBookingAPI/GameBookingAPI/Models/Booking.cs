@@ -17,6 +17,10 @@ namespace GameBookingAPI.Models
 
         public decimal TotalAmount { get; set; }
         public string? PaymentStatus { get; set; }
+        public string? PaymentMethod { get; set; }
 
+        // Razorpay fields
+        public string? RazorpayOrderId { get; set; }
+        public string? RazorpayPaymentId { get; set; }
     }
 }
