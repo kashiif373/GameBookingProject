@@ -49,8 +49,26 @@ function Register() {
       });
 
     } catch (err) {
-      setError("Registration failed. Please try again.");
-    }
+
+  const status = err.response?.status;
+  const serverMessage = err.response?.data?.message;
+
+  if (status === 400) {
+    setError(serverMessage || "Invalid input data.");
+  }
+  else if (status === 409) {
+    setError(serverMessage || "Email already exists.");
+  }
+  else if (status === 403) {
+    setError(serverMessage || "Access denied.");
+  }
+  else {
+    setError("Something went wrong. Please try again.");
+  }
+
+  setMessage("");
+}
+
   };
 
   const goToLogin = () => {

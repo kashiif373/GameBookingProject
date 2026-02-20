@@ -13,6 +13,8 @@ function Login() {
   });
 
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -23,30 +25,33 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setMessage("");
+    setError("");
+    setLoading(true);
 
     try {
-      const res = await API.post("/Users/login", {
-        email: formData.email,
-        password: formData.password
-      });
+      const res = await API.post("/Users/login", formData);
 
-      // ⭐ STORE JWT TOKEN
+      // Store JWT
       localStorage.setItem("token", res.data.token);
-
-      // Store user info
       localStorage.setItem("userName", res.data.name);
       localStorage.setItem("userEmail", res.data.email);
-      
-        if (res.data.userId) {
-          localStorage.setItem("userId", res.data.userId);
-        }
 
-      setMessage("Login successful 🎉");
+      if (res.data.userId) {
+        localStorage.setItem("userId", res.data.userId);
+      }
 
-      setTimeout(() => navigate("/dashboard"), 1000);
+      setMessage(res.data.message || "Login successful 🎉");
 
-    } catch (error) {
-      setMessage("Invalid credentials ❌");
+      setTimeout(() => navigate("/dashboard"), 1200);
+
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        "Login failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,18 +70,17 @@ function Login() {
 
           <h3 className="login-title">User Login</h3>
 
-          {message && (
-            <div className="alert-box">
-              {message}
-            </div>
-          )}
+          {message && <div className="alert success">{message}</div>}
+          {error && <div className="alert error">{error}</div>}
 
           <form onSubmit={handleLogin}>
 
             <input
               className="custom-input"
+              type="email"
               placeholder="Enter Email"
               name="email"
+              value={formData.email}
               onChange={handleChange}
               required
             />
@@ -86,17 +90,25 @@ function Login() {
               type="password"
               placeholder="Enter Password"
               name="password"
+              value={formData.password}
               onChange={handleChange}
               required
             />
 
-            <button className="login-btn">Login</button>
+            <button
+              className="login-btn"
+              disabled={loading}
+            >
+              {loading ? "Logging in..." : "Login"}
+            </button>
 
           </form>
 
           <p className="register-text">
             Don't have an account?
-            <Link to="/register" className="register-link"> Register</Link>
+            <Link to="/register" className="register-link">
+              {" "}Register
+            </Link>
           </p>
 
         </div>

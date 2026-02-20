@@ -23,49 +23,95 @@ namespace GameBookingAPI.Controllers
         }
 
         // ================= REGISTER =================
-        [HttpPost("register")]
-        public IActionResult Register([FromBody] User user)
+    [HttpPost("register")]
+public IActionResult Register([FromBody] User user)
+{
+    if (user == null)
+    {
+        return BadRequest(new
         {
-            if (string.IsNullOrEmpty(user.Email) ||
-                string.IsNullOrEmpty(user.Password) ||
-                string.IsNullOrEmpty(user.Name))
-            {
-                return BadRequest("All required fields must be filled.");
-            }
+            status = 400,
+            success = false,
+            message = "Invalid request data."
+        });
+    }
 
-            if (_context.Users.Any(u => u.Email == user.Email))
-            {
-                return BadRequest("Email already registered.");
-            }
+    if (string.IsNullOrWhiteSpace(user.Email) ||
+        string.IsNullOrWhiteSpace(user.Password) ||
+        string.IsNullOrWhiteSpace(user.Name))
+    {
+        return BadRequest(new
+        {
+            status = 400,
+            success = false,
+            message = "All required fields must be filled."
+        });
+    }
 
-            _context.Users.Add(user);
-            _context.SaveChanges();
+    var existingUser = _context.Users
+                               .FirstOrDefault(u => u.Email == user.Email);
 
-            return Ok("User registered successfully.");
-        }
+    if (existingUser != null)
+    {
+        return StatusCode(StatusCodes.Status409Conflict, new
+        {
+            status = 409,
+            success = false,
+            message = "Email ID already exists. Please use a different email."
+        });
+    }
+
+    _context.Users.Add(user);
+    _context.SaveChanges();
+
+    return Ok(new
+    {
+        status = 200,
+        success = true,
+        message = "Registration successful."
+    });
+}
+
+
 
         // ================= LOGIN =================
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest model)
+public IActionResult Login([FromBody] LoginRequest model)
+{
+    var user = _context.Users
+        .FirstOrDefault(u => u.Email == model.Email);
+
+    if (user == null)
+    {
+        return NotFound(new
         {
-            var user = _context.Users
-                .FirstOrDefault(u => u.Email == model.Email && u.Password == model.Password);
+            success = false,
+            message = "Email not found."
+        });
+    }
 
-            if (user == null)
-            {
-                return Unauthorized("Invalid email or password.");
-            }
+    if (user.Password != model.Password)
+    {
+        return Unauthorized(new
+        {
+            success = false,
+            message = "Incorrect password."
+        });
+    }
 
-            var token = GenerateJwtToken(user);
+    var token = GenerateJwtToken(user);
 
-            return Ok(new
-            {
-                token = token,
-                name = user.Name,
-                email = user.Email,
-                userId = user.UserId.ToString()
-            });
-        }
+    return Ok(new
+    {
+        success = true,
+        message = "Login successful.",
+        token = token,
+        name = user.Name,
+        email = user.Email,
+        userId = user.UserId.ToString()
+    });
+}
+
 
         // ================= LOGOUT =================
         [HttpPost("logout")]
