@@ -12,6 +12,8 @@ namespace GameBookingAPI.Models
         public string TimeSlot { get; set; }
         public decimal TotalAmount { get; set; }
         public string PaymentStatus { get; set; }
+        public string PaymentMethod { get; set; }
+
 
         public List<FoodDTO> Foods { get; set; }
     }

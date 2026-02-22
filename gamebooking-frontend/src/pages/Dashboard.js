@@ -16,18 +16,16 @@ function Dashboard() {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check authentication and get user info
     const checkAuth = () => {
       const auth = isAuthenticated();
       setAuthenticated(auth);
       if (!auth) {
-        // Not logged in, redirect to login
         navigate("/login");
       } else {
         setUser(getUserInfo());
       }
     };
-    
+
     fetchGames();
     checkAuth();
   }, [navigate]);
@@ -53,22 +51,19 @@ function Dashboard() {
     navigate("/");
   };
 
-  // Image Mapping Function
   const getGameImage = (name) => {
     const lower = name.toLowerCase();
-
     if (lower.includes("cricket")) return cricket;
     if (lower.includes("football")) return football;
     if (lower.includes("table")) return tabletennis;
     if (lower.includes("badminton")) return badminton;
-
     return "https://via.placeholder.com/400x300";
   };
 
   return (
     <div className="dashboard-page">
 
-      {/* ===== NAVBAR ===== */}
+      {/* NAVBAR */}
       <nav className="navbar">
         <div className="nav-logo" onClick={() => navigate("/")}>Playeato</div>
 
@@ -100,37 +95,34 @@ function Dashboard() {
           {games
             .filter((game) => !game.gameName.toLowerCase().includes("badminton"))
             .map((game) => (
-            <div key={game.gameId} className="col-xl-3 col-lg-4 col-md-6">
-              <div className="food-card">
+              <div key={game.gameId} className="col-xl-3 col-lg-4 col-md-6">
+                <div className="food-card">
 
-                {/* IMAGE */}
-                <div className="food-image">
-                  <img
-                    src={getGameImage(game.gameName)}
-                    alt={game.gameName}
-                  />
+                  {/* IMAGE */}
+                  <div className="game-image">
+                    <img src={getGameImage(game.gameName)} alt={game.gameName} />
+                  </div>
+
+                  {/* DETAILS */}
+                  <div className="food-details">
+                    <h5>{game.gameName}</h5>
+
+                    <button
+                      className="premium-btn mt-3"
+                      onClick={() => selectGame(game.gameId)}
+                    >
+                      Book Now →
+                    </button>
+                  </div>
+
                 </div>
-
-                {/* DETAILS */}
-                <div className="food-details">
-                  <h5>{game.gameName}</h5>
-
-                  <button
-                    className="premium-btn mt-3"
-                    onClick={() => selectGame(game.gameId)}
-                  >
-                    Book Now →
-                  </button>
-                </div>
-
               </div>
-            </div>
-          ))}
+            ))}
         </div>
 
       </div>
 
-      {/* ===== FOOTER ===== */}
+      {/* FOOTER */}
       <footer className="footer">
         <p>© 2026 GameZone Booking System</p>
         <p>All rights reserved.</p>

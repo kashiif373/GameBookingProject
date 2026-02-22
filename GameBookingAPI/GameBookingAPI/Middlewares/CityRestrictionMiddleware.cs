@@ -16,7 +16,10 @@ namespace GameBookingAPI.Middlewares
                 "183.82.33.7",
                 "121.242.155.146",
                 "182.79.24.74",
-                "115.97.15.72"
+                "115.97.15.72",
+               "152.57.81.212",
+               "27.5.80.160",
+
             };
 
         public CityRestrictionMiddleware(

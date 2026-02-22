@@ -1,5 +1,5 @@
 /* ============================= */
-/* LOCATIONS PAGE LAYOUT */
+/* PAGE LAYOUT */
 /* ============================= */
 
 .locations-page {
@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  font-family: "Segoe UI", sans-serif;
 }
 
 .locations-content {
@@ -56,28 +57,23 @@
   cursor: pointer;
   padding: 8px 16px;
   border-radius: 5px;
-  transition: 0.3s ease;
+  transition: 0.3s;
 }
 
 .nav-links button:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.nav-links .user-welcome {
+.user-welcome {
   color: #ddd;
   font-size: 15px;
 }
 
-.nav-links .logout-btn {
+.logout-btn {
   background: linear-gradient(45deg, #ff6b6b, #ff8e53);
   padding: 10px 20px;
   border-radius: 25px;
   font-weight: bold;
-}
-
-.nav-links .logout-btn:hover {
-  transform: scale(1.05);
-  background: linear-gradient(45deg, #ff5252, #ff7043);
 }
 
 /* ============================= */
@@ -87,7 +83,7 @@
 .hero-section {
   text-align: center;
   color: white;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 .hero-section h1 {
@@ -96,8 +92,37 @@
 }
 
 .hero-section p {
-  color: #ddd;
   font-size: 16px;
+  color: #ddd;
+}
+
+/* ============================= */
+/* GRID LAYOUT */
+/* ============================= */
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* Smaller card width */
+.col-xl-3 {
+  width: 220px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .col-xl-3 {
+    width: 45%;
+  }
+}
+
+@media (max-width: 480px) {
+  .col-xl-3 {
+    width: 100%;
+  }
 }
 
 /* ============================= */
@@ -108,28 +133,44 @@
   background: #1e293b;
   border-radius: 15px;
   overflow: hidden;
-  margin-bottom: 20px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
-  transition: 0.3s ease;
+  transition: 0.3s;
 }
 
 .food-card:hover {
   transform: translateY(-6px);
 }
 
-.food-image {
-  height: 140px;
+/* ============================= */
+/* PERFECT SQUARE IMAGE */
+/* ============================= */
+
+.location-image {
+  width: 70%;
+  aspect-ratio: 1 / 1;
+  margin: 15px auto;
+  border-radius: 12px;
   overflow: hidden;
 }
 
-.food-image img {
+.location-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: 0.4s;
 }
 
+/* Hover zoom effect */
+.food-card:hover .location-image img {
+  transform: scale(1.1);
+}
+
+/* ============================= */
+/* DETAILS */
+/* ============================= */
+
 .food-details {
-  padding: 15px;
+  padding: 12px;
   text-align: center;
   color: white;
 }
@@ -144,10 +185,9 @@
   margin: 5px 0;
 }
 
-.food-details .price {
-  font-weight: bold;
+.price {
   color: #4CAF50;
-  margin-bottom: 10px;
+  font-weight: bold;
 }
 
 /* ============================= */
@@ -162,7 +202,7 @@
   color: white;
   font-weight: bold;
   cursor: pointer;
-  transition: 0.3s ease;
+  transition: 0.3s;
   width: 100%;
   font-size: 14px;
 }
@@ -170,46 +210,6 @@
 .premium-btn:hover {
   transform: scale(1.05);
   background: linear-gradient(45deg, #45a049, #3d8b40);
-}
-
-/* ============================= */
-/* GRID LAYOUT */
-/* ============================= */
-
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  margin: -10px;
-}
-
-.g-4 {
-  margin: 10px;
-}
-
-.col-xl-3, .col-lg-4, .col-md-6 {
-  padding: 10px;
-}
-
-@media (min-width: 1200px) {
-  .col-xl-3 { width: 25%; }
-}
-
-@media (min-width: 992px) and (max-width: 1199px) {
-  .col-lg-4 { width: 33.333%; }
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  .col-md-6 { width: 50%; }
-}
-
-@media (max-width: 767px) {
-  .col-xl-3, .col-lg-4, .col-md-6 { width: 100%; }
 }
 
 /* ============================= */
@@ -230,7 +230,10 @@
   color: #aaa;
 }
 
-/* Utilities */
+/* ============================= */
+/* UTILITIES */
+/* ============================= */
+
 .mt-3 {
   margin-top: 10px;
 }
