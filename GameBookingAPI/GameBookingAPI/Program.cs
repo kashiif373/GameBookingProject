@@ -12,6 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 // ================= JWT CONFIG =================
 var jwtKey = builder.Configuration["Jwt:Key"];
 
@@ -35,14 +36,15 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(jwtKey)),
 
-        RoleClaimType = System.Security.Claims.ClaimTypes.Role   // ⭐ IMPORTANT FOR ADMIN
+        RoleClaimType = System.Security.Claims.ClaimTypes.Role
     };
 });
 
 builder.Services.AddAuthorization();
 // =================================================
 
-// CORS
+
+// ================= CORS =================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -53,14 +55,17 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Database
+
+// ================= DATABASE =================
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Memory Cache + HttpClient
+
+// ================= MEMORY CACHE =================
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
+
 
 var app = builder.Build();
 
@@ -72,22 +77,31 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
+// ⭐⭐⭐ IMPORTANT FOR IMAGE UPLOAD ⭐⭐⭐
+app.UseStaticFiles();
+// This enables serving files from wwwroot/uploads
+
+
 app.UseHttpsRedirection();
 
-// Forwarded Headers
+
+// Forwarded Headers (for hosting environments)
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor |
                        ForwardedHeaders.XForwardedProto
 });
 
-// ================= AUTH MIDDLEWARE ORDER =================
+
+// ================= AUTH ORDER =================
 app.UseAuthentication();
 app.UseAuthorization();
 
 // Custom middleware AFTER authentication
 app.UseMiddleware<CityRestrictionMiddleware>();
-// =========================================================
+// =================================================
+
 
 app.MapControllers();
 

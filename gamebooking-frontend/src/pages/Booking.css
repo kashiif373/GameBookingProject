@@ -32,52 +32,12 @@
   background: rgba(15, 32, 39, 0.95);
   backdrop-filter: blur(10px);
   z-index: 1000;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
 }
 
 .nav-logo {
   font-size: 28px;
   font-weight: bold;
   color: #4CAF50;
-  letter-spacing: 1px;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-
-.nav-links button {
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 8px 16px;
-  border-radius: 5px;
-  transition: 0.3s ease;
-}
-
-.nav-links button:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.nav-links .user-welcome {
-  color: #ddd;
-  font-size: 15px;
-}
-
-.nav-links .logout-btn {
-  background: linear-gradient(45deg, #ff6b6b, #ff8e53);
-  padding: 10px 20px;
-  border-radius: 25px;
-  font-weight: bold;
-}
-
-.nav-links .logout-btn:hover {
-  transform: scale(1.05);
-  background: linear-gradient(45deg, #ff5252, #ff7043);
 }
 
 /* ============================= */
@@ -85,9 +45,8 @@
 /* ============================= */
 
 .booking-container {
-  max-width: 600px;
+  max-width: 650px;
   margin: 0 auto;
-  padding: 20px;
 }
 
 .booking-title {
@@ -95,7 +54,6 @@
   color: white;
   font-size: 28px;
   margin-bottom: 25px;
-  font-weight: bold;
 }
 
 /* ============================= */
@@ -106,13 +64,11 @@
   background: #1e293b;
   border-radius: 15px;
   padding: 25px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .summary-section h4 {
   color: #4CAF50;
-  font-size: 18px;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 }
 
 .summary-item {
@@ -121,6 +77,7 @@
   color: #ddd;
   padding: 8px 0;
   font-size: 15px;
+  word-break: break-word;
 }
 
 .summary-item .price {
@@ -129,23 +86,46 @@
 }
 
 .food-item {
-  background: rgba(255, 255, 255, 0.05);
-  padding: 10px 15px;
-  border-radius: 8px;
-  margin-bottom: 8px;
+  background: rgba(255,255,255,0.05);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  color: #ddd;
 }
 
-.no-foods {
-  color: #888;
-  font-style: italic;
-  text-align: center;
-  padding: 15px;
-}
+/* ============================= */
+/* DIVIDER */
+/* ============================= */
 
 .summary-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255,255,255,0.1);
   margin: 20px 0;
+}
+
+/* ============================= */
+/* DATE + SLOT INPUT */
+/* ============================= */
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.date-input,
+.slot-select {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 14px;
+}
+
+/* FIX DROPDOWN TEXT VISIBILITY */
+.slot-select option {
+  background: white;
+  color: black;
 }
 
 /* ============================= */
@@ -155,24 +135,17 @@
 .total-section {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 15px 0;
-}
-
-.total-section span:first-child {
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
+  margin-top: 15px;
 }
 
 .total-amount {
   color: #4CAF50;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: bold;
 }
 
 /* ============================= */
-/* BUTTONS */
+/* BUTTON */
 /* ============================= */
 
 .confirm-btn {
@@ -183,96 +156,21 @@
   background: linear-gradient(45deg, #4CAF50, #45a049);
   color: white;
   font-size: 18px;
-  font-weight: bold;
   cursor: pointer;
-  transition: 0.3s;
-  margin-top: 15px;
+  margin-top: 20px;
 }
 
 .confirm-btn:hover {
   transform: scale(1.02);
-  background: linear-gradient(45deg, #45a049, #3d8b40);
-}
-
-.back-btn {
-  display: block;
-  width: 100%;
-  padding: 12px;
-  margin-top: 15px;
-  background: transparent;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 25px;
-  color: #ddd;
-  font-size: 15px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.back-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* ============================= */
-/* FOOTER */
+/* MESSAGE */
 /* ============================= */
 
-.footer {
-  background: #0f2027;
-  color: white;
+.no-slots {
+  color: #ff5252;
+  font-weight: bold;
   text-align: center;
-  padding: 20px;
-  margin-top: auto;
+  margin-top: 10px;
 }
-
-.footer p {
-  margin: 5px 0;
-  font-size: 14px;
-  color: #aaa;
-}
-
-/* Utilities */
-.mb-4 {
-  margin-bottom: 20px;
-}
-
-.mt-4 {
-  margin-top: 20px;
-}
-
-.text-center {
-  text-align: center;
-}
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  color: #ddd;
-  font-size: 14px;
-  display: block;
-  margin-bottom: 6px;
-}
-
-.date-input,
-.slot-select {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  background: rgba(255, 255, 255, 0.08);
-  color: white;
-  font-size: 14px;
-}
-
-.date-input:focus,
-.slot-select:focus {
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
-}
-
-.slot-select option {
-  color: black;
-}
-
-

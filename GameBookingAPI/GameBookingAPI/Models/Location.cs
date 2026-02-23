@@ -14,5 +14,6 @@ namespace GameBookingAPI.Models
         public string City { get; set; }
 
         public decimal PricePerHour { get; set; }
+        public string? ImageUrl { get; set; }
     }
 }

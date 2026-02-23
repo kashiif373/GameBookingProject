@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
-import API, { isAuthenticated, getUserInfo } from "../services/api";
+import API, { getUserInfo } from "../services/api";
 import "./Booking.css";
 import { useNavigate } from "react-router-dom";
 
 function Booking() {
   const navigate = useNavigate();
 
+  const [game, setGame] = useState(null);
   const [location, setLocation] = useState(null);
   const [foods, setFoods] = useState([]);
   const [selectedFoods, setSelectedFoods] = useState({});
   const [total, setTotal] = useState(0);
-  const [user, setUser] = useState(null);
-  const [authenticated, setAuthenticated] = useState(false);
 
   const [bookingDate, setBookingDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
@@ -19,12 +18,20 @@ function Booking() {
 
   const userInfo = getUserInfo();
   const userId = userInfo?.userId;
-  const locationId = localStorage.getItem("locationId");
   const gameId = localStorage.getItem("gameId");
+  const locationId = localStorage.getItem("locationId");
+
+  const allSlots = ["Morning", "Afternoon", "Evening"];
+
+  // LOCAL DATE FIX
+  const getTodayDate = () => {
+    const today = new Date();
+    const offset = today.getTimezoneOffset();
+    const localDate = new Date(today.getTime() - offset * 60000);
+    return localDate.toISOString().split("T")[0];
+  };
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-    checkAuth();
     loadData();
   }, []);
 
@@ -34,37 +41,25 @@ function Booking() {
     }
   }, [location, foods, selectedFoods]);
 
-  const checkAuth = () => {
-    const auth = isAuthenticated();
-    setAuthenticated(auth);
-    if (auth) setUser(getUserInfo());
-  };
-
+  // LOAD ALL DATA
   const loadData = async () => {
     try {
+      // GAME
+      const gameRes = await API.get("/Games");
+      const selectedGame = gameRes.data.find(g => g.gameId == gameId);
+      setGame(selectedGame);
+
+      // LOCATION
       const locRes = await API.get(`/Locations/${gameId}`);
-      const selectedLoc = locRes.data.find(
-        (l) => l.locationId == locationId
-      );
-
-      if (!selectedLoc) {
-        alert("Location not found.");
-        navigate("/locations");
-        return;
-      }
-
+      const selectedLoc = locRes.data.find(l => l.locationId == locationId);
       setLocation(selectedLoc);
 
+      // FOODS
       const foodRes = await API.get("/Foods");
       setFoods(foodRes.data);
 
       const storedFoods =
         JSON.parse(localStorage.getItem("selectedFoods")) || {};
-
-      Object.keys(storedFoods).forEach((id) => {
-        storedFoods[id] = Number(storedFoods[id]);
-      });
-
       setSelectedFoods(storedFoods);
 
     } catch {
@@ -72,10 +67,11 @@ function Booking() {
     }
   };
 
+  // TOTAL CALCULATION
   const calculateTotal = (locPrice, foodsList, selected) => {
     let totalAmount = Number(locPrice);
 
-    foodsList.forEach((food) => {
+    foodsList.forEach(food => {
       if (selected[food.foodId] > 0) {
         totalAmount += food.price * selected[food.foodId];
       }
@@ -84,37 +80,40 @@ function Booking() {
     setTotal(totalAmount);
   };
 
-  // ⭐ FETCH BOOKED SLOTS (NORMALIZED)
+  // FETCH BOOKED SLOTS
   const fetchBookedSlots = async (date, locId) => {
     try {
       const res = await API.get(
         `/Bookings/slots?locationId=${locId}&date=${date}`
       );
 
-      const normalized = res.data.map((slot) => {
-        let value = "";
-
-        if (typeof slot === "string") value = slot;
-        else if (slot.timeSlot) value = slot.timeSlot;
-
-        return value.trim().split(" ")[0]; // extract Morning/Afternoon/Evening
+      const normalized = res.data.map(slot => {
+        let value = typeof slot === "string" ? slot : slot.timeSlot;
+        return value.trim().split(" ")[0];
       });
 
       setBookedSlots(normalized);
+      setTimeSlot("");
 
     } catch {
-      console.log("Error loading booked slots");
+      console.log("Error loading slots");
     }
   };
 
+  // FILTER AVAILABLE SLOTS
+  const availableSlots = allSlots.filter(
+    slot => !bookedSlots.includes(slot)
+  );
+
+  // CONFIRM BOOKING
   const confirmBooking = async () => {
-    if (!userId) {
-      alert("Please login again");
+    if (!bookingDate || !timeSlot) {
+      alert("Please select date & slot");
       return;
     }
 
-    if (!bookingDate || !timeSlot) {
-      alert("Please select date & slot");
+    if (bookingDate < getTodayDate()) {
+      alert("Cannot book past date");
       return;
     }
 
@@ -124,28 +123,28 @@ function Booking() {
         gameId: Number(gameId),
         locationId: Number(locationId),
         bookingDate: new Date(bookingDate + "T00:00:00").toISOString(),
-        timeSlot: timeSlot,
+        timeSlot,
         totalAmount: total,
         paymentStatus: "Pending",
         paymentMethod: "Online"
       };
 
       const res = await API.post("/Bookings", bookingData);
-      const bookingId = res.data.bookingId;
 
-      localStorage.setItem("bookingId", bookingId);
+      localStorage.setItem("bookingId", res.data.bookingId);
       localStorage.setItem("totalAmount", total);
 
       navigate("/payment");
 
-    } catch (err) {
-      alert(err.response?.data || "Booking failed");
+    } catch {
+      alert("Booking failed");
     }
   };
 
   return (
     <div className="booking-page">
 
+      {/* NAVBAR */}
       <nav className="navbar">
         <div className="nav-logo">Playeato</div>
       </nav>
@@ -156,16 +155,28 @@ function Booking() {
 
           <div className="summary-card">
 
+            {/* GAME */}
+            {game && (
+              <div className="summary-section">
+                <h4>🎮 Game</h4>
+                <div className="summary-item">
+                  <span>{game.gameName}</span>
+                </div>
+              </div>
+            )}
+
+            <div className="summary-divider"></div>
+
             {/* LOCATION */}
-            <div className="summary-section">
-              <h4>📍 Location</h4>
-              {location && (
+            {location && (
+              <div className="summary-section">
+                <h4>📍 Location</h4>
                 <div className="summary-item">
                   <span>{location.locationName}</span>
                   <span className="price">₹{location.pricePerHour}</span>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             <div className="summary-divider"></div>
 
@@ -174,17 +185,13 @@ function Booking() {
               <h4>🍕 Selected Foods</h4>
 
               {foods.filter(f => selectedFoods[f.foodId] > 0).length === 0 ? (
-                <p>No food selected</p>
+                <p className="no-foods">No food selected</p>
               ) : (
                 foods.map(
-                  (food) =>
+                  food =>
                     selectedFoods[food.foodId] > 0 && (
-                      <div key={food.foodId} className="summary-item">
-                        <span>{food.foodName}</span>
-                        <span>
-                          x {selectedFoods[food.foodId]} — ₹
-                          {food.price * selectedFoods[food.foodId]}
-                        </span>
+                      <div key={food.foodId} className="food-item">
+                        {food.foodName} x {selectedFoods[food.foodId]}
                       </div>
                     )
                 )
@@ -193,13 +200,14 @@ function Booking() {
 
             <div className="summary-divider"></div>
 
-            {/* ⭐ DATE & SLOT (NEW LOGIC) */}
+            {/* DATE + SLOT */}
             <div className="summary-section">
               <h4>📅 Select Date & Slot</h4>
 
               <input
                 type="date"
-                min={new Date().toISOString().split("T")[0]}
+                className="date-input"
+                min={getTodayDate()}
                 value={bookingDate}
                 onChange={(e) => {
                   setBookingDate(e.target.value);
@@ -207,25 +215,27 @@ function Booking() {
                 }}
               />
 
-              <select
-                value={timeSlot}
-                onChange={(e) => {
-                  const selected = e.target.value;
+              {bookingDate && availableSlots.length === 0 ? (
+                <p className="no-slots">
+                  ❌ All slots are booked for this date
+                </p>
+              ) : (
+                <select
+                  className="slot-select"
+                  value={timeSlot}
+                  onChange={(e) => setTimeSlot(e.target.value)}
+                >
+                  <option value="">Select Slot</option>
 
-                  if (bookedSlots.includes(selected)) {
-                    alert("❌ This slot is already full!");
-                    setTimeSlot("");
-                    return;
-                  }
-
-                  setTimeSlot(selected);
-                }}
-              >
-                <option value="">Select Slot</option>
-                <option value="Morning">Morning (6AM-12PM)</option>
-                <option value="Afternoon">Afternoon (12PM-6PM)</option>
-                <option value="Evening">Evening (6PM-11PM)</option>
-              </select>
+                  {availableSlots.map(slot => (
+                    <option key={slot} value={slot}>
+                      {slot === "Morning" && "Morning (6AM-12PM)"}
+                      {slot === "Afternoon" && "Afternoon (12PM-6PM)"}
+                      {slot === "Evening" && "Evening (6PM-11PM)"}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <div className="summary-divider"></div>
@@ -238,7 +248,7 @@ function Booking() {
 
             <button
               className="confirm-btn"
-              disabled={!bookingDate || !timeSlot}
+              disabled={!timeSlot}
               onClick={confirmBooking}
             >
               Confirm Booking →
