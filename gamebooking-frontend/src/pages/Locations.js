@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import API from "../services/api";
-import { logout, isAuthenticated, getUserInfo } from "../services/api";
+import API, { isAuthenticated, getUserInfo } from "../services/api";
 import "./Locations.css";
 import { useNavigate } from "react-router-dom";
 
@@ -21,8 +20,8 @@ function Locations() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchLocations();
     checkAuth();
+    fetchLocations();
   }, []);
 
   const checkAuth = () => {
@@ -32,6 +31,12 @@ function Locations() {
   };
 
   const fetchLocations = async () => {
+    if (!gameId) {
+      alert("Please select a game first");
+      navigate("/dashboard");
+      return;
+    }
+
     try {
       const res = await API.get(`/Locations/${gameId}`);
       setLocations(res.data);
@@ -45,25 +50,27 @@ function Locations() {
     navigate("/foods");
   };
 
-  const handleLogout = () => {
-    logout();
-    setAuthenticated(false);
-    navigate("/");
-  };
-
+  // ⭐ FIXED IMAGE LOGIC
   const getLocationImage = (name) => {
     const lower = name.toLowerCase();
+
     if (lower.includes("patna cricket")) return patnacricketground;
     if (lower.includes("aligarh cricket")) return aligarhcricketstadium;
     if (lower.includes("patna football")) return patnafootballturf;
     if (lower.includes("aligarh football")) return aligarhfootballarena;
-    if (lower.includes("tt")) return patnattclub;
-    return aligarhttcenter;
+
+    if (lower.includes("patna") && lower.includes("tt"))
+      return patnattclub;
+
+    if (lower.includes("aligarh") && lower.includes("tt"))
+      return aligarhttcenter;
+
+    return patnacricketground; // fallback
   };
 
   return (
     <div className="locations-page">
-
+      {/* NAVBAR */}
       <nav className="navbar">
         <div className="nav-logo">Playeato</div>
 
@@ -72,18 +79,15 @@ function Locations() {
           <button onClick={() => navigate("/dashboard")}>Games</button>
 
           {authenticated && user ? (
-            <>
-              <span className="user-welcome">Hello, {user.name}!</span>
-              <button onClick={handleLogout} className="logout-btn">Logout</button>
-            </>
+            <span className="user-welcome">Hello, {user.name}!</span>
           ) : (
             <button onClick={() => navigate("/login")}>Login</button>
           )}
         </div>
       </nav>
 
+      {/* CONTENT */}
       <div className="locations-content">
-
         <div className="hero-section">
           <h1>Select Location</h1>
           <p>Choose your preferred gaming zone</p>
@@ -93,10 +97,14 @@ function Locations() {
           {locations.map((loc) => (
             <div key={loc.locationId} className="col-xl-3 col-lg-4 col-md-6">
               <div className="food-card">
-
-                {/* ⭐ UPDATED CLASS */}
                 <div className="location-image">
-                  <img src={getLocationImage(loc.locationName)} alt={loc.locationName}/>
+                  <img
+                    src={getLocationImage(loc.locationName)}
+                    alt={loc.locationName}
+                    onError={(e) =>
+                      (e.target.src = patnacricketground)
+                    }
+                  />
                 </div>
 
                 <div className="food-details">
@@ -104,24 +112,24 @@ function Locations() {
                   <p><strong>City:</strong> {loc.city}</p>
                   <p className="price">₹ {loc.pricePerHour} / hour</p>
 
-                  <button className="premium-btn mt-3"
-                    onClick={() => selectLocation(loc.locationId)}>
+                  <button
+                    className="premium-btn mt-3"
+                    onClick={() => selectLocation(loc.locationId)}
+                  >
                     Select Location →
                   </button>
                 </div>
-
               </div>
             </div>
           ))}
         </div>
-
       </div>
 
+      {/* FOOTER */}
       <footer className="footer">
         <p>© 2026 GameZone Booking System</p>
         <p>All rights reserved.</p>
       </footer>
-
     </div>
   );
 }

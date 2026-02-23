@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API from "../services/api";
-import { logout, isAuthenticated, getUserInfo } from "../services/api";
+import { isAuthenticated, getUserInfo } from "../services/api";
 import "./Foods.css";
 import { useNavigate } from "react-router-dom";
 
@@ -53,13 +53,6 @@ function Foods() {
     navigate("/booking");
   };
 
-  const handleLogout = () => {
-    logout();
-    setAuthenticated(false);
-    setUser(null);
-    navigate("/");
-  };
-
   const getFoodImage = (name) => {
     const lower = name.toLowerCase();
     if (lower.includes("biryani")) return biryani;
@@ -84,7 +77,6 @@ function Foods() {
           {authenticated && user ? (
             <>
               <span className="user-welcome">Hello, {user.name}!</span>
-              <button onClick={handleLogout} className="logout-btn">Logout</button>
             </>
           ) : (
             <button onClick={() => navigate("/login")}>Login</button>

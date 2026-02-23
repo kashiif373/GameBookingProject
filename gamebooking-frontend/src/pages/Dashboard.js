@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API from "../services/api";
-import { logout, isAuthenticated, getUserInfo } from "../services/api";
+import { isAuthenticated, getUserInfo } from "../services/api";
 import "./Dashboard.css";
 import { useNavigate } from "react-router-dom";
 
@@ -44,13 +44,6 @@ function Dashboard() {
     navigate("/locations");
   };
 
-  const handleLogout = () => {
-    logout();
-    setAuthenticated(false);
-    setUser(null);
-    navigate("/");
-  };
-
   const getGameImage = (name) => {
     const lower = name.toLowerCase();
     if (lower.includes("cricket")) return cricket;
@@ -74,7 +67,6 @@ function Dashboard() {
           {authenticated && user ? (
             <>
               <span className="user-welcome">Hello, {user.name}!</span>
-              <button onClick={handleLogout} className="logout-btn">Logout</button>
             </>
           ) : (
             <button onClick={() => navigate("/login")}>Login</button>

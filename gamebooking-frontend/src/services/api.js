@@ -1,11 +1,10 @@
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const API = axios.create({
   baseURL: "http://localhost:5203/api"
 });
 
-// ⭐ JWT INTERCEPTOR — SEND TOKEN IN EVERY REQUEST
+// ================= JWT INTERCEPTOR =================
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
@@ -18,58 +17,51 @@ API.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
-// ⭐ RESPONSE INTERCEPTOR — HANDLE JWT ERRORS
+// ================= RESPONSE INTERCEPTOR =================
 API.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error) => {
-    // Handle 401 Unauthorized (token expired or invalid)
     if (error.response && error.response.status === 401) {
-      // Clear local storage and redirect to login
-      localStorage.removeItem("token");
-      localStorage.removeItem("userName");
-      localStorage.removeItem("userEmail");
-      localStorage.removeItem("userId");
-      
-      // Redirect to login page
+      localStorage.clear();
       window.location.href = "/login";
     }
     return Promise.reject(error);
   }
 );
 
-// ⭐ LOGOUT FUNCTION
+// ================= LOGOUT =================
 export const logout = async () => {
   try {
-    // Call logout endpoint (optional, for logging purposes)
     await API.post("/Users/logout");
   } catch (error) {
-    // Even if the server call fails, we still want to clear local storage
-    console.log("Logout API call failed, but clearing local storage");
+    console.log("Logout API failed");
   } finally {
-    // Always clear local storage
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("gameId");
+    localStorage.clear();
   }
 };
 
-// ⭐ CHECK IF USER IS AUTHENTICATED
+// ================= AUTH CHECK =================
 export const isAuthenticated = () => {
-  const token = localStorage.getItem("token");
-  return !!token; // Returns true if token exists
+  return !!localStorage.getItem("token");
 };
 
-// ⭐ GET USER INFO FROM LOCALSTORAGE
+// ================= ⭐ IMPORTANT — GET USER INFO FROM JWT =================
 export const getUserInfo = () => {
-  return {
-    name: localStorage.getItem("userName"),
-    email: localStorage.getItem("userEmail"),
-    userId: localStorage.getItem("userId")
-  };
+  const token = localStorage.getItem("token");
+  if (!token) return null;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+
+    return {
+      name: payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"],
+      email: payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"],
+      role: payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"],
+      userId: payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"]
+    };
+  } catch {
+    return null;
+  }
 };
 
 export default API;

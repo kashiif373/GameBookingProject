@@ -11,7 +11,6 @@ namespace GameBookingAPI.Models
 
         public string? Email { get; set; }
 
-
         public string Phone { get; set; }
 
         public string Password { get; set; }
@@ -25,5 +24,8 @@ namespace GameBookingAPI.Models
         public bool IsEligible { get; set; }
 
         public bool IsVerified { get; set; }
+
+        // ⭐ NEW FIELD FOR ADMIN SYSTEM
+        public string Role { get; set; } = "User";
     }
 }

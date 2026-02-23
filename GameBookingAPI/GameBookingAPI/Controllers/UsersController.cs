@@ -23,103 +23,101 @@ namespace GameBookingAPI.Controllers
         }
 
         // ================= REGISTER =================
-    [HttpPost("register")]
-public IActionResult Register([FromBody] User user)
-{
-    if (user == null)
-    {
-        return BadRequest(new
+        [HttpPost("register")]
+        public IActionResult Register([FromBody] User user)
         {
-            status = 400,
-            success = false,
-            message = "Invalid request data."
-        });
-    }
+            if (user == null)
+            {
+                return BadRequest(new
+                {
+                    status = 400,
+                    success = false,
+                    message = "Invalid request data."
+                });
+            }
 
-    if (string.IsNullOrWhiteSpace(user.Email) ||
-        string.IsNullOrWhiteSpace(user.Password) ||
-        string.IsNullOrWhiteSpace(user.Name))
-    {
-        return BadRequest(new
-        {
-            status = 400,
-            success = false,
-            message = "All required fields must be filled."
-        });
-    }
+            if (string.IsNullOrWhiteSpace(user.Email) ||
+                string.IsNullOrWhiteSpace(user.Password) ||
+                string.IsNullOrWhiteSpace(user.Name))
+            {
+                return BadRequest(new
+                {
+                    status = 400,
+                    success = false,
+                    message = "All required fields must be filled."
+                });
+            }
 
-    var existingUser = _context.Users
-                               .FirstOrDefault(u => u.Email == user.Email);
+            var existingUser = _context.Users
+                                       .FirstOrDefault(u => u.Email == user.Email);
 
-    if (existingUser != null)
-    {
-        return StatusCode(StatusCodes.Status409Conflict, new
-        {
-            status = 409,
-            success = false,
-            message = "Email ID already exists. Please use a different email."
-        });
-    }
+            if (existingUser != null)
+            {
+                return StatusCode(StatusCodes.Status409Conflict, new
+                {
+                    status = 409,
+                    success = false,
+                    message = "Email ID already exists."
+                });
+            }
 
-    _context.Users.Add(user);
-    _context.SaveChanges();
+            // Default Role for new users
+            user.Role = "User";
 
-    return Ok(new
-    {
-        status = 200,
-        success = true,
-        message = "Registration successful."
-    });
-}
+            _context.Users.Add(user);
+            _context.SaveChanges();
 
-
+            return Ok(new
+            {
+                status = 200,
+                success = true,
+                message = "Registration successful."
+            });
+        }
 
         // ================= LOGIN =================
         [HttpPost("login")]
-public IActionResult Login([FromBody] LoginRequest model)
-{
-    var user = _context.Users
-        .FirstOrDefault(u => u.Email == model.Email);
-
-    if (user == null)
-    {
-        return NotFound(new
+        public IActionResult Login([FromBody] LoginRequest model)
         {
-            success = false,
-            message = "Email not found."
-        });
-    }
+            var user = _context.Users
+                .FirstOrDefault(u => u.Email == model.Email);
 
-    if (user.Password != model.Password)
-    {
-        return Unauthorized(new
-        {
-            success = false,
-            message = "Incorrect password."
-        });
-    }
+            if (user == null)
+            {
+                return NotFound(new
+                {
+                    success = false,
+                    message = "Email not found."
+                });
+            }
 
-    var token = GenerateJwtToken(user);
+            if (user.Password != model.Password)
+            {
+                return Unauthorized(new
+                {
+                    success = false,
+                    message = "Incorrect password."
+                });
+            }
 
-    return Ok(new
-    {
-        success = true,
-        message = "Login successful.",
-        token = token,
-        name = user.Name,
-        email = user.Email,
-        userId = user.UserId.ToString()
-    });
-}
+            var token = GenerateJwtToken(user);
 
+            return Ok(new
+            {
+                success = true,
+                message = "Login successful.",
+                token = token,
+                name = user.Name,
+                email = user.Email,
+                role = user.Role,     // ⭐ send role to frontend
+                userId = user.UserId.ToString()
+            });
+        }
 
         // ================= LOGOUT =================
         [HttpPost("logout")]
         public IActionResult Logout()
         {
-            // For JWT-based authentication, logout is handled on client side
-            // by removing the token from localStorage/sessionStorage.
-            // The server just returns a success message.
             return Ok(new { message = "Logout successful" });
         }
 
@@ -130,7 +128,8 @@ public IActionResult Login([FromBody] LoginRequest model)
             {
                 new Claim(ClaimTypes.Name, user.Name),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.Role, user.Role)   // ⭐ ADMIN SUPPORT
             };
 
             var key = new SymmetricSecurityKey(

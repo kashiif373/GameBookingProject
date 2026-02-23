@@ -16,29 +16,57 @@ namespace GameBookingAPI.Controllers
             _context = context;
         }
 
-        // ==============================
-        // CREATE BOOKING
-        // ==============================
-        [HttpPost]
-        public IActionResult CreateBooking(Booking booking)
+        // =========================================================
+        // GET BOOKED SLOTS FOR A DATE + LOCATION
+        // =========================================================
+        [HttpGet("slots")]
+        public IActionResult GetBookedSlots(int locationId, DateTime date)
         {
+            var bookedSlots = _context.Bookings
+                .Where(b => b.LocationId == locationId &&
+                            b.BookingDate.Date == date.Date)
+                .Select(b => b.TimeSlot)
+                .ToList();
+
+            return Ok(bookedSlots);
+        }
+
+        // =========================================================
+        // CREATE BOOKING
+        // =========================================================
+        [HttpPost]
+        public IActionResult CreateBooking([FromBody] Booking booking)
+        {
+            if (booking == null)
+                return BadRequest("Invalid booking data");
+
             var user = _context.Users.FirstOrDefault(u => u.UserId == booking.UserId);
 
             if (user == null)
                 return BadRequest("User not found");
 
+            // ⭐ PREVENT DOUBLE BOOKING
+            var slotExists = _context.Bookings.Any(b =>
+                b.LocationId == booking.LocationId &&
+                b.BookingDate.Date == booking.BookingDate.Date &&
+                b.TimeSlot == booking.TimeSlot);
+
+            if (slotExists)
+                return BadRequest("This slot is already booked.");
+
+            // ⭐ Default values
             booking.PaymentStatus = "Pending";
             booking.PaymentMethod = "Not Selected";
 
             _context.Bookings.Add(booking);
             _context.SaveChanges();
 
-            return Ok(new { BookingId = booking.BookingId });
+            return Ok(new { bookingId = booking.BookingId });
         }
 
-        // ==============================
+        // =========================================================
         // UPDATE PAYMENT STATUS + METHOD
-        // ==============================
+        // =========================================================
         [HttpPut("{id}")]
         public IActionResult UpdatePayment(int id, [FromBody] Booking updatedBooking)
         {
@@ -61,14 +89,18 @@ namespace GameBookingAPI.Controllers
             });
         }
 
-        // ==============================
-        // BOOKING HISTORY
-        // ==============================
+        // =========================================================
+        // BOOKING HISTORY (LATEST FIRST ⭐ UPDATED)
+        // =========================================================
         [HttpGet("history/{userId}")]
         public IActionResult GetBookingHistory(int userId)
         {
             var history = _context.Bookings
                 .Where(b => b.UserId == userId)
+
+                // ⭐ IMPORTANT — NEWEST BOOKING FIRST
+                .OrderByDescending(b => b.BookingId)
+
                 .Select(b => new BookingHistoryDTO
                 {
                     BookingId = b.BookingId,

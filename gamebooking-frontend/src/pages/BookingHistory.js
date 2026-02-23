@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API from "../services/api";
+import { getUserInfo } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import "./BookingHistory.css";
 
@@ -8,17 +9,29 @@ function BookingHistory() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const userId = localStorage.getItem("userId");
+  const currentUser = getUserInfo();
+  const userId = currentUser?.userId;
 
   useEffect(() => {
+    if (!userId) {
+      navigate("/login");
+      return;
+    }
+
     fetchBookings();
   }, []);
 
   const fetchBookings = async () => {
     try {
-      // ⭐ UPDATED API
       const res = await API.get(`/bookings/history/${userId}`);
-      setBookings(res.data);
+
+      // ⭐ IMPORTANT: Sort newest first (fallback safety)
+      const sorted = res.data.sort(
+        (a, b) => new Date(b.bookingDate) - new Date(a.bookingDate)
+      );
+
+      setBookings(sorted);
+
     } catch (error) {
       console.error(error);
       alert("Failed to load bookings");
@@ -37,7 +50,10 @@ function BookingHistory() {
         <div className="no-bookings-box">
           <h3>No Bookings Yet 😔</h3>
           <p>You haven't made any bookings yet.</p>
-          <button className="browse-btn" onClick={() => navigate("/dashboard")}>
+          <button
+            className="browse-btn"
+            onClick={() => navigate("/dashboard")}
+          >
             Browse Games →
           </button>
         </div>
@@ -65,8 +81,7 @@ function BookingHistory() {
                 </span>
               </p>
 
-              {/* ⭐ FOOD LIST */}
-              {b.foods.length > 0 && (
+              {b.foods && b.foods.length > 0 && (
                 <div className="food-history">
                   <strong>Foods Ordered:</strong>
                   <ul>

@@ -33,7 +33,9 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
 
         IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtKey))
+            Encoding.UTF8.GetBytes(jwtKey)),
+
+        RoleClaimType = System.Security.Claims.ClaimTypes.Role   // ⭐ IMPORTANT FOR ADMIN
     };
 });
 
@@ -79,14 +81,13 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
                        ForwardedHeaders.XForwardedProto
 });
 
-// ================= IMPORTANT ORDER =================
-// JWT must come BEFORE Authorization
+// ================= AUTH MIDDLEWARE ORDER =================
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Your custom middleware AFTER authentication
+// Custom middleware AFTER authentication
 app.UseMiddleware<CityRestrictionMiddleware>();
-// ===================================================
+// =========================================================
 
 app.MapControllers();
 

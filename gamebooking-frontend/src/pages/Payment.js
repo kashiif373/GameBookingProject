@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import API from "../services/api";
-import { logout, isAuthenticated, getUserInfo } from "../services/api";
+import { isAuthenticated, getUserInfo } from "../services/api";
 import "./Payment.css";
 import { useNavigate } from "react-router-dom";
 
@@ -37,12 +37,6 @@ function Payment() {
     document.body.appendChild(script);
   };
 
-  const handleLogout = () => {
-    logout();
-    setAuthenticated(false);
-    setUser(null);
-    navigate("/");
-  };
 
   // Handle Pay on Location
   const handlePayOnLocation = async () => {
@@ -217,7 +211,6 @@ function Payment() {
           {authenticated && user ? (
             <>
               <span className="user-welcome">Hello, {user.name}!</span>
-              <button onClick={handleLogout} className="logout-btn">Logout</button>
             </>
           ) : (
             <button onClick={() => navigate("/login")}>Login</button>

@@ -7,31 +7,44 @@ import Locations from "./pages/Locations";
 import Foods from "./pages/Foods";
 import Booking from "./pages/Booking";
 import BookingHistory from "./pages/BookingHistory";
-
 import Payment from "./pages/Payment";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import AdminRoute from "./components/AdminRoute";
+
+/* ===== ADMIN IMPORTS ===== */
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import ManageGames from "./pages/admin/ManageGames";
+import ManageLocations from "./pages/admin/ManageLocations";
+import ManageUsers from "./pages/admin/ManageUsers";
+import ManageBookings from "./pages/admin/ManageBookings";
 
 function App() {
   return (
     <Router>
       <Routes>
 
-        {/* HOME PAGE */}
+        {/* ===== HOME ===== */}
         <Route path="/" element={<Home />} />
 
-        {/* AUTH */}
+        {/* ===== AUTH ===== */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* APP PAGES */}
+        {/* ===== USER APP ===== */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/locations" element={<Locations />} />
         <Route path="/foods" element={<Foods />} />
         <Route path="/booking" element={<Booking />} />
         <Route path="/history" element={<BookingHistory />} />
-
         <Route path="/payment" element={<Payment />} />
+
+        {/* ===== ADMIN PANEL ===== */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/games" element={<ManageGames />} />
+        <Route path="/admin/locations" element={<ManageLocations />} />
+        <Route path="/admin/users" element={<ManageUsers />} />
+        <Route path="/admin/bookings" element={<ManageBookings />} />
 
       </Routes>
     </Router>

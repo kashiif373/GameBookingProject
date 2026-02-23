@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import "./Register.css";
-import { logout, isAuthenticated, getUserInfo } from "../services/api";
+import { isAuthenticated, getUserInfo } from "../services/api";
 
 function Register() {
 
@@ -17,13 +17,6 @@ function Register() {
       setUser(getUserInfo());
     }
   }, []);
-
-  const handleLogout = () => {
-    logout();
-    setAuthenticated(false);
-    setUser(null);
-    navigate("/");
-  };
 
   const [formData, setFormData] = useState({
     name: "",

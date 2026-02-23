@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import API from "../services/api";
 import "./Login.css";
 import { useNavigate, Link } from "react-router-dom";
-import { logout, isAuthenticated, getUserInfo } from "../services/api";
+import { isAuthenticated, getUserInfo } from "../services/api";
 
 function Login() {
 
@@ -13,17 +13,19 @@ function Login() {
   useEffect(() => {
     const auth = isAuthenticated();
     setAuthenticated(auth);
+
     if (auth) {
-      setUser(getUserInfo());
+      const info = getUserInfo();
+      setUser(info);
+
+      // ⭐ AUTO REDIRECT IF ALREADY LOGGED IN
+      if (info?.role === "Admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");  // Normal user - redirect to homepage
+      }
     }
   }, []);
-
-  const handleLogout = () => {
-    logout();
-    setAuthenticated(false);
-    setUser(null);
-    navigate("/");
-  };
 
   const [formData, setFormData] = useState({
     email: "",
@@ -50,17 +52,21 @@ function Login() {
     try {
       const res = await API.post("/Users/login", formData);
 
+      // ⭐ STORE ONLY TOKEN
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("userName", res.data.name);
-      localStorage.setItem("userEmail", res.data.email);
-
-      if (res.data.userId) {
-        localStorage.setItem("userId", res.data.userId);
-      }
 
       setMessage(res.data.message || "Login successful 🎉");
 
-      setTimeout(() => navigate("/dashboard"), 1200);
+      // ⭐ READ ROLE FROM TOKEN
+      const userInfo = getUserInfo();
+
+      setTimeout(() => {
+        if (userInfo?.role === "Admin") {
+          navigate("/admin");      // Admin redirect
+        } else {
+          navigate("/");           // Normal user - redirect to homepage
+        }
+      }, 1200);
 
     } catch (err) {
       setError(
@@ -85,7 +91,6 @@ function Login() {
           {authenticated && user ? (
             <>
               <span className="user-welcome">Hello, {user.name}!</span>
-              <button onClick={handleLogout} className="logout-btn">Logout</button>
             </>
           ) : (
             <button onClick={() => navigate("/login")}>Login</button>
@@ -132,10 +137,7 @@ function Login() {
                 required
               />
 
-              <button
-                className="login-btn"
-                disabled={loading}
-              >
+              <button className="login-btn" disabled={loading}>
                 {loading ? "Logging in..." : "Login"}
               </button>
 
