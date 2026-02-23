@@ -79,7 +79,7 @@ if (app.Environment.IsDevelopment())
 
 
 // ⭐⭐⭐ IMPORTANT FOR IMAGE UPLOAD ⭐⭐⭐
-app.UseStaticFiles();
+//app.UseStaticFiles();
 // This enables serving files from wwwroot/uploads
 
 
