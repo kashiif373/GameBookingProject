@@ -81,7 +81,9 @@ namespace GameBookingAPI.Controllers
   </div>
 </div>";
 
-            await _emailService.SendEmailAsync(user.Email, "Welcome to Playeato 🎮", body);
+            _ = Task.Run(() =>
+                _emailService.SendEmailAsync(user.Email, "Welcome to Playeato 🎮", body)
+            );
 
             return Ok(new { message = "Registration successful." });
         }
@@ -109,42 +111,6 @@ namespace GameBookingAPI.Controllers
                 role = user.Role
             });
         }
-        // public IActionResult Login([FromBody] LoginRequest model)
-        // {
-        //     var user = _context.Users
-        //         .FirstOrDefault(u => u.Email == model.Email);
- 
-        //     if (user == null)
-        //     {
-        //         return NotFound(new
-        //         {
-        //             success = false,
-        //             message = "Email not found."
-        //         });
-        //     }
- 
-        //     if (user.Password != model.Password)
-        //     {
-        //         return Unauthorized(new
-        //         {
-        //             success = false,
-        //             message = "Incorrect password."
-        //         });
-        //     }
- 
-        //     var token = GenerateJwtToken(user);
- 
-        //     return Ok(new
-        //     {
-        //         success = true,
-        //         message = "Login successful.",
-        //         token = token,
-        //         name = user.Name,
-        //         email = user.Email,
-        //         role = user.Role,     // ⭐ send role to frontend
-        //         userId = user.UserId.ToString()
-        //     });
-        // }
 
         // ================= SEND OTP =================
         [HttpPost("send-otp")]
@@ -166,7 +132,6 @@ namespace GameBookingAPI.Controllers
 
             await _context.SaveChangesAsync();
 
-            // ===== BEAUTIFUL OTP EMAIL =====
             string body = $@"
 <div style='font-family:Segoe UI,Arial; background:#f4f6f8; padding:30px'>
   <div style='max-width:600px; margin:auto; background:white; border-radius:12px; overflow:hidden; box-shadow:0 8px 25px rgba(0,0,0,0.1)'>
@@ -203,7 +168,9 @@ namespace GameBookingAPI.Controllers
   </div>
 </div>";
 
-            await _emailService.SendEmailAsync(model.Email, "Playeato OTP Verification 🔐", body);
+            _ = Task.Run(() =>
+                _emailService.SendEmailAsync(model.Email, "Playeato OTP Verification 🔐", body)
+            );
 
             return Ok(new { message = "OTP sent to email." });
         }
@@ -226,6 +193,12 @@ namespace GameBookingAPI.Controllers
             user.OTPExpiry = null;
 
             await _context.SaveChangesAsync();
+
+            string successBody = $@"Hello {user.Name}, your password has been successfully changed.";
+
+            _ = Task.Run(() =>
+                _emailService.SendEmailAsync(model.Email, "Playeato Password Changed ✅", successBody)
+            );
 
             return Ok(new { message = "Password reset successful." });
         }
@@ -255,7 +228,6 @@ namespace GameBookingAPI.Controllers
         }
     }
 
-    // ================= DTOs =================
     public class EmailDto { public string Email { get; set; } }
     public class ResetOtpDto { public string Email { get; set; } public string OTP { get; set; } public string NewPassword { get; set; } }
     public class LoginRequest { public string Email { get; set; } public string Password { get; set; } }

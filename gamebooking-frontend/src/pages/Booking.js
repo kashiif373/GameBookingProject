@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import API, { getUserInfo } from "../services/api";
 import "./Booking.css";
+import Select from "react-select";
 import { useNavigate } from "react-router-dom";
 
 function Booking() {
@@ -11,6 +12,7 @@ function Booking() {
   const [foods, setFoods] = useState([]);
   const [selectedFoods, setSelectedFoods] = useState({});
   const [total, setTotal] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const [bookingDate, setBookingDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
@@ -146,7 +148,24 @@ function Booking() {
   return (
     <div className="booking-page">
       <nav className="navbar">
-        <div className="nav-logo">Playeato</div>
+        <div className="nav-logo" onClick={() => navigate("/")}>Playeato</div>
+
+        {/* Hamburger Menu Button */}
+        <button 
+          className={`hamburger ${menuOpen ? 'active' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div className={`nav-links ${menuOpen ? 'active' : ''}`}>
+          <button onClick={() => { navigate("/"); setMenuOpen(false); }}>Home</button>
+          <button onClick={() => { navigate("/dashboard"); setMenuOpen(false); }}>Games</button>
+          <button onClick={() => { navigate("/history"); setMenuOpen(false); }}>My Bookings</button>
+        </div>
       </nav>
 
       <div className="booking-content">
@@ -211,13 +230,29 @@ function Booking() {
                 max={getMaxDate()}
                 value={bookingDate}
                 onChange={(e) => {
-                  setBookingDate(e.target.value);
-                  fetchBookedSlots(e.target.value, locationId);
+                  const selectedDate = e.target.value;
+                  const today = getTodayDate();
+                  const maxDate = getMaxDate();
+
+                  if (selectedDate < today) {
+                    alert("You cannot book a past date!");
+                    setBookingDate("");
+                    return;
+                  }
+
+                  if (selectedDate > maxDate) {
+                    alert("Booking allowed only within 90 days from today!");
+                    setBookingDate("");
+                    return;
+                  }
+
+                  setBookingDate(selectedDate);
+                  fetchBookedSlots(selectedDate, locationId);
                 }}
               />
 
               {bookingDate && availableSlots.length === 0 ? (
-                <p className="no-slots">❌ All slots unavailable for today</p>
+                <p className="no-slots">All slots unavailable for today</p>
               ) : (
                 <select
                   className="slot-select"

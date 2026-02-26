@@ -132,3 +132,101 @@
   font-size: 13px;
   margin: 2px 0;
 }
+/* ================================================= */
+/* ✅ MOBILE RESPONSIVE (Phones ≤ 768px) */
+/* ================================================= */
+
+@media (max-width: 768px) {
+
+  .history-page {
+    padding: 15px;
+  }
+
+  .history-title {
+    font-size: 20px;
+  }
+
+  .history-container {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .history-card {
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+
+  .history-card h3 {
+    font-size: 16px;
+  }
+
+  .history-card p {
+    font-size: 13px;
+  }
+
+  .no-bookings-box {
+    width: 100%;
+    padding: 25px;
+  }
+
+  .browse-btn,
+  .cancel-btn,
+  .back-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .food-history li {
+    font-size: 12px;
+  }
+}
+
+/* ================================================= */
+/* ✅ SMALL PHONES (≤ 480px) */
+/* ================================================= */
+
+@media (max-width: 480px) {
+
+  .history-page {
+    padding: 10px;
+  }
+
+  .history-title {
+    font-size: 18px;
+  }
+
+  .history-card {
+    padding: 12px;
+  }
+
+  .history-card h3 {
+    font-size: 15px;
+  }
+
+  .history-card p {
+    font-size: 12px;
+  }
+}
+
+/* ================================================= */
+/* ✅ TABLET RESPONSIVE (≤ 1024px) */
+/* ================================================= */
+
+@media (max-width: 1024px) {
+
+  .history-container {
+    width: 95%;
+  }
+}
+
+/* ================================================= */
+/* ✅ LARGE SCREENS (≥ 1200px) */
+/* ================================================= */
+
+@media (min-width: 1200px) {
+
+  .history-container {
+    max-width: 700px;
+  }
+}

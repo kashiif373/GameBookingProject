@@ -205,3 +205,305 @@
   background: #4CAF50;
   color: white;
 }
+
+/* ============================= */
+/* HAMBURGER MENU */
+/* ============================= */
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
+
+.hamburger span {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: white;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* ============================= */
+/* RESPONSIVE - MOBILE */
+/* ============================= */
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 70%;
+    max-width: 300px;
+    height: 100vh;
+    background: rgba(15, 32, 39, 0.98);
+    backdrop-filter: blur(10px);
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 80px;
+    gap: 20px;
+    transition: right 0.3s ease;
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }
+
+  .nav-links.active {
+    right: 0;
+  }
+
+  .nav-links button {
+    font-size: 18px;
+    padding: 15px 20px;
+    text-align: left;
+    width: 100%;
+    border-radius: 0;
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+
+  .nav-links button:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .navbar {
+    padding: 15px 20px;
+  }
+
+  .nav-logo {
+    font-size: 22px;
+  }
+
+  .booking-content {
+    padding: 15px;
+    padding-top: 100px;
+  }
+
+  .booking-container {
+    width: 100%;
+    padding: 0 10px;
+  }
+
+  .booking-title {
+    font-size: 22px;
+  }
+
+  .summary-card {
+    padding: 20px;
+  }
+
+  .summary-item {
+    font-size: 14px;
+  }
+
+  .confirm-btn {
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  /* FIX: Slot and Date responsiveness */
+  .date-input,
+  .slot-select {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 14px 12px !important;
+    font-size: 16px !important;
+    border-radius: 8px !important;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  /* Custom arrow for select */
+  .slot-select {
+    background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    background-size: 20px !important;
+    padding-right: 40px !important;
+  }
+
+  /* Date input calendar icon */
+  .date-input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    opacity: 0.8;
+  }
+
+  /* Make sure form inputs don't overflow */
+  .summary-section {
+    overflow: visible;
+    word-wrap: break-word;
+  }
+}
+
+/* ============================= */
+/* RESPONSIVE - SMALL MOBILE */
+/* ============================= */
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 12px 15px;
+  }
+
+  .booking-content {
+    padding: 10px;
+    padding-top: 140px;
+  }
+
+  .booking-title {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+
+  .summary-card {
+    padding: 15px;
+  }
+
+  .summary-section h4 {
+    font-size: 16px;
+  }
+
+  .summary-item {
+    font-size: 13px;
+    padding: 6px 0;
+  }
+
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  .date-input,
+  .slot-select {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .total-amount {
+    font-size: 22px;
+  }
+
+  .confirm-btn {
+    padding: 12px 10px;
+    font-size: 15px;
+  }
+
+  .add-more-foods-btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ============================= */
+/* RESPONSIVE - TABLET */
+/* ============================= */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .navbar {
+    padding: 15px 25px;
+  }
+
+  .booking-content {
+    padding-top: 100px;
+  }
+
+  .booking-container {
+    max-width: 550px;
+  }
+}
+
+/* ============================= */
+/* RESPONSIVE - LARGE DESKTOP */
+/* ============================= */
+
+@media (min-width: 1400px) {
+  .booking-content {
+    padding: 30px 60px;
+    padding-top: 110px;
+  }
+
+  .booking-container {
+    max-width: 700px;
+  }
+}
+/* ===================================== */
+/* FINAL RESPONSIVE FIX FOR DATE & SLOT */
+/* ===================================== */
+
+/* Ensure full width always */
+.date-input,
+.slot-select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  display: block;
+}
+
+/* Prevent overflow inside card */
+.summary-section {
+  overflow: hidden;
+}
+
+/* Fix mobile zoom issue (VERY IMPORTANT) */
+@media (max-width: 768px) {
+  .date-input,
+  .slot-select {
+    font-size: 16px;   /* prevents iOS zoom */
+  }
+}
+
+/* Improve select dropdown arrow spacing */
+.slot-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Add custom arrow */
+.slot-select {
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 18px;
+  padding-right: 35px;
+}
+
+/* Make date icon visible in dark theme */
+.date-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+/* Prevent select from stretching oddly on Safari */
+.slot-select:focus {
+  outline: none;
+}

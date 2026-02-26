@@ -7,6 +7,7 @@ function Home() {
   const navigate = useNavigate();
   const [authenticated, setAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -18,11 +19,17 @@ function Home() {
     checkAuth();
   }, []);
 
-  const handleLogout = () => {
+const handleLogout = () => {
     logout();
     setAuthenticated(false);
     setUser(null);
+    setMenuOpen(false);
     navigate("/");
+  };
+
+  const handleNavClick = (path) => {
+    navigate(path);
+    setMenuOpen(false);
   };
 
   return (
@@ -32,13 +39,24 @@ function Home() {
       <nav className="navbar">
         <div className="nav-logo">Playeato</div>
 
-        <div className="nav-links">
-          <button onClick={() => navigate("/")}>Home</button>
-          <button onClick={() => navigate("/dashboard")}>Games</button>
+        {/* Hamburger Menu Button */}
+        <button 
+          className={`hamburger ${menuOpen ? 'active' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div className={`nav-links ${menuOpen ? 'active' : ''}`}>
+          <button onClick={() => handleNavClick("/")}>Home</button>
+          <button onClick={() => handleNavClick("/dashboard")}>Games</button>
 
           {/* ⭐ NEW BUTTON */}
           {authenticated && (
-            <button onClick={() => navigate("/history")}>
+            <button onClick={() => handleNavClick("/history")}>
               My Bookings
             </button>
           )}
@@ -51,7 +69,7 @@ function Home() {
               </button>
             </>
           ) : (
-            <button onClick={() => navigate("/login")}>Login</button>
+            <button onClick={() => handleNavClick("/login")}>Login</button>
           )}
         </div>
       </nav>

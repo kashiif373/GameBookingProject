@@ -208,3 +208,185 @@
   padding: 20px;
   border-radius: 12px;
 }
+
+/* ============================= */
+/* RESPONSIVE - MOBILE SIDEBAR */
+/* ============================= */
+
+@media (max-width: 768px) {
+  .admin-container {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 15px;
+    gap: 10px;
+  }
+
+  .admin-sidebar h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .admin-sidebar button {
+    flex: 1;
+    min-width: 80px;
+    margin-right: 0;
+    font-size: 13px;
+    padding: 10px 8px;
+    white-space: nowrap;
+  }
+
+  .admin-content {
+    padding: 15px;
+  }
+
+  .admin-content h2 {
+    font-size: 20px;
+  }
+
+  .admin-cards {
+    gap: 15px;
+    justify-content: center;
+  }
+
+  .admin-card {
+    width: 45%;
+    min-width: 140px;
+    padding: 20px 15px;
+  }
+
+  .admin-card h3 {
+    font-size: 24px;
+  }
+
+  .admin-card p {
+    font-size: 13px;
+  }
+
+  .admin-form {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .admin-form input {
+    width: 100%;
+  }
+
+  .admin-form button {
+    width: 100%;
+  }
+
+  .admin-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+}
+
+/* ============================= */
+/* RESPONSIVE - SMALL MOBILE */
+/* ============================= */
+
+@media (max-width: 480px) {
+  .admin-sidebar {
+    padding: 10px;
+  }
+
+  .admin-sidebar h2 {
+    font-size: 16px;
+  }
+
+  .admin-sidebar button {
+    font-size: 12px;
+    padding: 8px 6px;
+  }
+
+  .admin-content {
+    padding: 10px;
+  }
+
+  .admin-content h2 {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  .admin-card {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .admin-card h3 {
+    font-size: 22px;
+  }
+
+  .admin-form input {
+    font-size: 14px;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 8px 5px;
+    font-size: 12px;
+  }
+
+  .delete-btn {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .admin-role,
+  .user-role {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+}
+
+/* ============================= */
+/* RESPONSIVE - TABLET */
+/* ============================= */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .admin-sidebar {
+    width: 200px;
+    padding: 20px 15px;
+  }
+
+  .admin-content {
+    padding: 25px;
+  }
+
+  .admin-card {
+    width: 180px;
+  }
+}
+
+/* ============================= */
+/* RESPONSIVE - LARGE DESKTOP */
+/* ============================= */
+
+@media (min-width: 1400px) {
+  .admin-sidebar {
+    width: 280px;
+    padding: 40px 25px;
+  }
+
+  .admin-content {
+    padding: 50px;
+  }
+
+  .admin-card {
+    width: 260px;
+    padding: 35px;
+  }
+}

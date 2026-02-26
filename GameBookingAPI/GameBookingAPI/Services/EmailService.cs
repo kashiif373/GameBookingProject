@@ -29,7 +29,7 @@ namespace GameBookingAPI.Services
 
             var mailMessage = new MailMessage
             {
-                From = new MailAddress(email),
+                From = new MailAddress(email," Playeato Team "),
                 Subject = subject,
                 Body = body,
                 IsBodyHtml = true

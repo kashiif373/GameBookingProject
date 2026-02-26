@@ -14,6 +14,7 @@ function Dashboard() {
   const [games, setGames] = useState([]);
   const [user, setUser] = useState(null);
   const [authenticated, setAuthenticated] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = () => {
@@ -39,9 +40,23 @@ function Dashboard() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setAuthenticated(false);
+    setUser(null);
+    setMenuOpen(false);
+    navigate("/");
+  };
+
   const selectGame = (gameId) => {
     localStorage.setItem("gameId", gameId);
     navigate("/locations");
+  };
+
+  const handleNavClick = (path) => {
+    navigate(path);
+    setMenuOpen(false);
   };
 
   const getGameImage = (name) => {
@@ -56,21 +71,35 @@ function Dashboard() {
   return (
     <div className="dashboard-page">
 
-      {/* NAVBAR */}
+{/* NAVBAR */}
       <nav className="navbar">
         <div className="nav-logo" onClick={() => navigate("/")}>Playeato</div>
 
-        <div className="nav-links">
-          <button onClick={() => navigate("/")}>Home</button>
-          <button onClick={() => navigate("/dashboard")}>Games</button>
-          <button onClick={() => navigate("/history")}>My Bookings</button>
+        {/* Hamburger Menu Button */}
+        <button 
+          className={`hamburger ${menuOpen ? 'active' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div className={`nav-links ${menuOpen ? 'active' : ''}`}>
+          <button onClick={() => handleNavClick("/")}>Home</button>
+          <button onClick={() => handleNavClick("/dashboard")}>Games</button>
+          <button onClick={() => handleNavClick("/history")}>My Bookings</button>
 
           {authenticated && user ? (
             <>
               <span className="user-welcome">Hello, {user.name}!</span>
+              <button onClick={handleLogout} className="logout-btn">
+                Logout
+              </button>
             </>
           ) : (
-            <button onClick={() => navigate("/login")}>Login</button>
+            <button onClick={() => handleNavClick("/login")}>Login</button>
           )}
         </div>
       </nav>

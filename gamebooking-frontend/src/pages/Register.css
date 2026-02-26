@@ -5,7 +5,7 @@
   flex-direction: column;
   overflow-x: hidden;
 }
-
+ 
 .register-wrapper {
   display: flex;
   flex: 1;
@@ -16,7 +16,7 @@
   min-height: 100vh;
   overflow-x: hidden;
 }
-
+ 
 /* ===== LEFT PANEL ===== */
 .register-left {
   flex: 1;
@@ -27,20 +27,20 @@
   justify-content: center;
   padding: 60px 80px;
 }
-
+ 
 .brand-title {
   font-size: 42px;
   font-weight: 700;
   margin-bottom: 20px;
 }
-
+ 
 .brand-subtitle {
   font-size: 18px;
   opacity: 0.9;
   max-width: 380px;
   line-height: 1.6;
 }
-
+ 
 /* ===== RIGHT PANEL ===== */
 .register-right {
   flex: 1;
@@ -49,7 +49,7 @@
   align-items: center;
   padding: 20px;
 }
-
+ 
 /* ===== REGISTER CARD ===== */
 .register-card {
   width: 100%;
@@ -61,7 +61,7 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
 }
-
+ 
 /* ===== TITLE ===== */
 .register-title {
   text-align: center;
@@ -70,7 +70,7 @@
   margin-bottom: 25px;
   color: #ffffff;
 }
-
+ 
 /* ===== ALERT ===== */
 .alert {
   padding: 12px;
@@ -80,15 +80,15 @@
   font-size: 14px;
   color: white;
 }
-
+ 
 .alert.success {
   background: rgba(0, 255, 150, 0.2);
 }
-
+ 
 .alert.error {
   background: rgba(255, 0, 80, 0.2);
 }
-
+ 
 /* ===== INPUT FIELDS ===== */
 .custom-input {
   width: 100%;
@@ -102,13 +102,13 @@
   transition: 0.3s;
   box-sizing: border-box;
 }
-
+ 
 .custom-input:focus {
   outline: none;
   box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
   transform: scale(1.02);
 }
-
+ 
 /* ===== VALIDATION ERROR TEXT ===== */
 .error-text {
   display: block;
@@ -119,12 +119,12 @@
   text-align: left;
   padding-left: 5px;
 }
-
+ 
 /* ===== SELECT FIX ===== */
 select.custom-input {
   cursor: pointer;
 }
-
+ 
 /* ===== CHECKBOX ===== */
 .checkbox-wrapper {
   display: flex;
@@ -134,7 +134,7 @@ select.custom-input {
   color: white;
   font-size: 13px;
 }
-
+ 
 /* ===== BUTTON ===== */
 .register-btn {
   width: 100%;
@@ -149,12 +149,12 @@ select.custom-input {
   transition: 0.3s;
   margin-top: 5px;
 }
-
+ 
 .register-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 25px rgba(0, 114, 255, 0.5);
 }
-
+ 
 /* ===== BACK BUTTON ===== */
 .back-btn {
   width: 100%;
@@ -168,37 +168,69 @@ select.custom-input {
   transition: 0.3s;
   margin-top: 12px;
 }
-
+ 
 .back-btn:hover {
   background: rgba(255, 255, 255, 0.1);
 }
-
+ 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
   .register-wrapper {
     flex-direction: column;
   }
-
+ 
   .register-left {
     padding: 30px 20px;
     text-align: center;
     align-items: center;
   }
-
+ 
   .brand-title {
     font-size: 28px;
   }
-
+ 
   .brand-subtitle {
     font-size: 15px;
     max-width: 100%;
   }
-
+ 
   .register-right {
     padding: 20px 15px;
   }
-
+ 
   .register-card {
     padding: 25px 20px;
   }
+}
+.register-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+/* ===== PASSWORD EYE TOGGLE ===== */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+ 
+.password-wrapper .custom-input {
+  padding-right: 45px; /* space for eye */
+}
+ 
+.eye-icon {
+  position: absolute;
+  top: 38%;
+  right: 15px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  user-select: none;
+  transition: 0.2s;
+}
+ 
+.eye-icon:hover {
+  transform: translateY(-50%) scale(1.1);
+}
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
 }

@@ -15,6 +15,7 @@ function Foods() {
   const [selectedFoods, setSelectedFoods] = useState({});
   const [user, setUser] = useState(null);
   const [authenticated, setAuthenticated] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Load saved foods from localStorage on component mount
   useEffect(() => {
@@ -52,7 +53,7 @@ function Foods() {
       const newQty = currentQty + change;
 
       if (newQty > 10) {
-        alert("❌ Maximum 10 quantities allowed per item");
+        alert("Maximum 10 quantities allowed per item");
         return prev;
       }
 
@@ -67,6 +68,11 @@ function Foods() {
   const proceedBooking = () => {
     localStorage.setItem("selectedFoods", JSON.stringify(selectedFoods));
     navigate("/booking");
+  };
+
+  const handleNavClick = (path) => {
+    navigate(path);
+    setMenuOpen(false);
   };
 
   const getFoodImage = (name) => {
@@ -84,17 +90,28 @@ function Foods() {
 
       {/* NAVBAR */}
       <nav className="navbar">
-        <div className="nav-logo">Playeato</div>
+        <div className="nav-logo" onClick={() => navigate("/")}>Playeato</div>
 
-        <div className="nav-links">
-          <button onClick={() => navigate("/")}>Home</button>
-          <button onClick={() => navigate("/dashboard")}>Games</button>
-          <button onClick={() => navigate("/history")}>My Bookings</button>
+        {/* Hamburger Menu Button */}
+        <button 
+          className={`hamburger ${menuOpen ? 'active' : ''}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div className={`nav-links ${menuOpen ? 'active' : ''}`}>
+          <button onClick={() => handleNavClick("/")}>Home</button>
+          <button onClick={() => handleNavClick("/dashboard")}>Games</button>
+          <button onClick={() => handleNavClick("/history")}>My Bookings</button>
 
           {authenticated && user ? (
             <span className="user-welcome">Hello, {user.name}!</span>
           ) : (
-            <button onClick={() => navigate("/login")}>Login</button>
+            <button onClick={() => handleNavClick("/login")}>Login</button>
           )}
         </div>
       </nav>
