@@ -32,6 +32,7 @@ function Register() {
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
 
+  // ================= INPUT CHANGE =================
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -39,7 +40,7 @@ function Register() {
       ...formData,
       [name]: type === "checkbox" ? checked : value
     });
-    
+
     if (validationErrors[name]) {
       setValidationErrors({
         ...validationErrors,
@@ -48,56 +49,67 @@ function Register() {
     }
   };
 
+  // ================= FORM VALIDATION =================
   const validateForm = () => {
     const errors = {};
-    
+
     if (!formData.name.trim()) {
       errors.name = "Name is required";
-    } else if (formData.name.trim().length < 2) {
-      errors.name = "Name must be at least 2 characters";
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
       errors.email = "Email is required";
     } else if (!emailRegex.test(formData.email)) {
-      errors.email = "Please enter a valid email address";
+      errors.email = "Invalid email format";
     }
 
     const phoneRegex = /^\d{10}$/;
     if (!formData.phone.trim()) {
-      errors.phone = "Phone number is required";
+      errors.phone = "Phone is required";
     } else if (!phoneRegex.test(formData.phone)) {
-      errors.phone = "Phone number must be 10 digits";
+      errors.phone = "Phone must be 10 digits";
     }
 
     if (!formData.password) {
-      errors.password = "Password is required";
+      errors.password = "Password required";
     } else if (formData.password.length < 6) {
-      errors.password = "Password must be at least 6 characters";
+      errors.password = "Minimum 6 characters required";
     }
 
     if (!formData.selectedCity) {
-      errors.selectedCity = "Please select a city";
+      errors.selectedCity = "Select city";
     }
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
+  // ================= REGISTER SUBMIT =================
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
     setError("");
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     try {
-      const response = await API.post("/Users/register", formData);
-      setMessage(response.data.message);
+      // ⭐ IMPORTANT: Send correct payload matching backend model
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        selectedCity: formData.selectedCity,
+        detectedCity: formData.detectedCity,
+        isGpsEnabled: formData.isGpsEnabled
+      };
 
+      const response = await API.post("/Users/register", payload);
+
+      setMessage("Registration successful! Welcome email sent 🎉");
+
+      // Clear form
       setFormData({
         name: "",
         email: "",
@@ -108,40 +120,35 @@ function Register() {
         isGpsEnabled: false
       });
 
+      // Redirect to login after 2 seconds
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+
     } catch (err) {
       const status = err.response?.status;
       const serverMessage = err.response?.data?.message;
 
-      if (status === 400) {
-        setError(serverMessage || "Invalid input data.");
+      if (status === 409) {
+        setError(serverMessage || "Email already exists");
+      } else if (status === 400) {
+        setError(serverMessage || "Invalid data");
+      } else {
+        setError("Something went wrong. Try again.");
       }
-      else if (status === 409) {
-        setError(serverMessage || "Email already exists.");
-      }
-      else if (status === 403) {
-        setError(serverMessage || "Access denied.");
-      }
-      else {
-        setError("Something went wrong. Please try again.");
-      }
-
-      setMessage("");
     }
   };
 
-  const goToLogin = () => {
-    navigate("/login");
-  };
+  const goToLogin = () => navigate("/login");
 
   return (
     <div className="register-page">
-
       <div className="register-wrapper">
 
         <div className="register-left">
           <h1 className="brand-title">Join Us Today 🚀</h1>
           <p className="brand-subtitle">
-            Create your account and start managing everything in one secure place.
+            Create your account and start playing instantly.
           </p>
         </div>
 
@@ -155,51 +162,20 @@ function Register() {
 
             <form onSubmit={handleSubmit}>
 
-              <input
-                className="custom-input"
-                name="name"
-                placeholder="👤 Full Name"
-                value={formData.name}
-                onChange={handleChange}
-              />
+              <input className="custom-input" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} />
               {validationErrors.name && <span className="error-text">{validationErrors.name}</span>}
 
-              <input
-                className="custom-input"
-                name="email"
-                placeholder="📧 Email Address"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
+              <input className="custom-input" name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange} />
               {validationErrors.email && <span className="error-text">{validationErrors.email}</span>}
 
-              <input
-                className="custom-input"
-                name="phone"
-                placeholder="📱 Phone Number"
-                value={formData.phone}
-                onChange={handleChange}
-              />
+              <input className="custom-input" name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} />
               {validationErrors.phone && <span className="error-text">{validationErrors.phone}</span>}
 
-              <input
-                className="custom-input"
-                name="password"
-                placeholder="🔒 Password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-              />
+              <input className="custom-input" name="password" type="password" placeholder="Password" value={formData.password} onChange={handleChange} />
               {validationErrors.password && <span className="error-text">{validationErrors.password}</span>}
 
-              <select
-                className="custom-input"
-                name="selectedCity"
-                value={formData.selectedCity}
-                onChange={handleChange}
-              >
-                <option value="">🏙️ Select City</option>
+              <select className="custom-input" name="selectedCity" value={formData.selectedCity} onChange={handleChange}>
+                <option value="">Select City</option>
                 <option value="Patna">Patna</option>
                 <option value="Aligarh">Aligarh</option>
                 <option value="Other">Other</option>
@@ -207,39 +183,26 @@ function Register() {
               {validationErrors.selectedCity && <span className="error-text">{validationErrors.selectedCity}</span>}
 
               <div className="checkbox-wrapper">
-                <input
-                  type="checkbox"
-                  name="isGpsEnabled"
-                  checked={formData.isGpsEnabled}
-                  onChange={handleChange}
-                />
-                <label>Use My Current Location (GPS)</label>
+                <input type="checkbox" name="isGpsEnabled" checked={formData.isGpsEnabled} onChange={handleChange} />
+                <label>Use My Current Location</label>
               </div>
 
               <button type="submit" className="register-btn">
                 Register Now
               </button>
 
-              <button 
-                type="button" 
-                className="back-btn"
-                onClick={goToLogin}
-              >
+              <button type="button" className="back-btn" onClick={goToLogin}>
                 ← Back to Login
               </button>
 
             </form>
-
           </div>
         </div>
-
       </div>
 
       <footer className="footer">
-        <p>© 2026 GameZone Booking System</p>
-        <p>All rights reserved.</p>
+        <p>© 2026 Playeato Booking System</p>
       </footer>
-
     </div>
   );
 }

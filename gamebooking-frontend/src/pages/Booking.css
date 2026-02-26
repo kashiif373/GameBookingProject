@@ -174,3 +174,34 @@
   text-align: center;
   margin-top: 10px;
 }
+
+/* ============================= */
+/* DATE ERROR MESSAGE */
+/* ============================= */
+
+.date-error {
+  color: #ff5252;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* ============================= */
+/* ADD MORE FOODS BUTTON */
+/* ============================= */
+
+.add-more-foods-btn {
+  padding: 8px 16px;
+  border: 1px solid #4CAF50;
+  border-radius: 20px;
+  background: transparent;
+  color: #4CAF50;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-more-foods-btn:hover {
+  background: #4CAF50;
+  color: white;
+}

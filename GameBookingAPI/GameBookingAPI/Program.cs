@@ -1,5 +1,6 @@
 using GameBookingAPI.Data;
 using GameBookingAPI.Middlewares;
+using GameBookingAPI.Services;   // ⭐ Added
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
@@ -62,6 +63,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
+// ================= EMAIL SERVICE =================
+builder.Services.AddScoped<EmailService>();   // ⭐ Added
+
+
 // ================= MEMORY CACHE =================
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpClient();
@@ -77,16 +82,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
-// ⭐⭐⭐ IMPORTANT FOR IMAGE UPLOAD ⭐⭐⭐
-//app.UseStaticFiles();
-// This enables serving files from wwwroot/uploads
-
-
 app.UseHttpsRedirection();
 
-
-// Forwarded Headers (for hosting environments)
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor |
@@ -100,8 +97,6 @@ app.UseAuthorization();
 
 // Custom middleware AFTER authentication
 app.UseMiddleware<CityRestrictionMiddleware>();
-// =================================================
-
 
 app.MapControllers();
 

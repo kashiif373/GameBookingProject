@@ -18,14 +18,13 @@ function Login() {
       const info = getUserInfo();
       setUser(info);
 
-      // ⭐ AUTO REDIRECT IF ALREADY LOGGED IN
       if (info?.role === "Admin") {
         navigate("/admin");
       } else {
-        navigate("/");  // Normal user - redirect to homepage
+        navigate("/");
       }
     }
-  }, []);
+  }, [navigate]);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -52,21 +51,19 @@ function Login() {
     try {
       const res = await API.post("/Users/login", formData);
 
-      // ⭐ STORE ONLY TOKEN
       localStorage.setItem("token", res.data.token);
 
-      setMessage(res.data.message || "Login successful 🎉");
+      setMessage("Login successful 🎉");
 
-      // ⭐ READ ROLE FROM TOKEN
       const userInfo = getUserInfo();
 
       setTimeout(() => {
         if (userInfo?.role === "Admin") {
-          navigate("/admin");      // Admin redirect
+          navigate("/admin");
         } else {
-          navigate("/");           // Normal user - redirect to homepage
+          navigate("/");
         }
-      }, 1200);
+      }, 1000);
 
     } catch (err) {
       setError(
@@ -81,7 +78,7 @@ function Login() {
   return (
     <div className="login-page">
 
-      <nav className="navbar">
+      {/* <nav className="navbar">
         <div className="nav-logo" onClick={() => navigate("/")}>Playeato</div>
 
         <div className="nav-links">
@@ -89,14 +86,12 @@ function Login() {
           <button onClick={() => navigate("/dashboard")}>Games</button>
 
           {authenticated && user ? (
-            <>
-              <span className="user-welcome">Hello, {user.name}!</span>
-            </>
+            <span className="user-welcome">Hello, {user.name}!</span>
           ) : (
             <button onClick={() => navigate("/login")}>Login</button>
           )}
         </div>
-      </nav>
+      </nav> */}
 
       <div className="login-wrapper">
 
@@ -137,6 +132,14 @@ function Login() {
                 required
               />
 
+              {/* ⭐ NEW FORGOT PASSWORD LINK */}
+              <p
+                className="forgot-link"
+                onClick={() => navigate("/forgot-password")}
+              >
+                Forgot Password?
+              </p>
+
               <button className="login-btn" disabled={loading}>
                 {loading ? "Logging in..." : "Login"}
               </button>
@@ -156,7 +159,7 @@ function Login() {
       </div>
 
       <footer className="footer">
-        <p>© 2026 GameZone Booking System</p>
+        <p>© 2026 Playeato Booking System</p>
         <p>All rights reserved.</p>
       </footer>
 

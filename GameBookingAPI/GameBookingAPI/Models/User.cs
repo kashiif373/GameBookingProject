@@ -27,5 +27,8 @@ namespace GameBookingAPI.Models
 
         // ⭐ NEW FIELD FOR ADMIN SYSTEM
         public string Role { get; set; } = "User";
+        public string? ResetOTP { get; set; }
+
+        public DateTime? OTPExpiry { get; set; }
     }
 }

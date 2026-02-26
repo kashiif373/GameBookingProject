@@ -24,7 +24,8 @@ namespace GameBookingAPI.Controllers
         {
             var bookedSlots = _context.Bookings
                 .Where(b => b.LocationId == locationId &&
-                            b.BookingDate.Date == date.Date)
+                            b.BookingDate.Date == date.Date &&
+                            b.PaymentStatus != "Cancelled")
                 .Select(b => b.TimeSlot)
                 .ToList();
 
@@ -45,16 +46,22 @@ namespace GameBookingAPI.Controllers
             if (user == null)
                 return BadRequest("User not found");
 
-            // ⭐ PREVENT DOUBLE BOOKING
+            var maxDate = DateTime.Today.AddDays(90);
+            if (booking.BookingDate.Date > maxDate)
+                return BadRequest("Cannot book more than 90 days in advance");
+
+            if (booking.BookingDate.Date < DateTime.Today)
+                return BadRequest("Cannot book past dates");
+
             var slotExists = _context.Bookings.Any(b =>
                 b.LocationId == booking.LocationId &&
                 b.BookingDate.Date == booking.BookingDate.Date &&
-                b.TimeSlot == booking.TimeSlot);
+                b.TimeSlot == booking.TimeSlot &&
+                b.PaymentStatus != "Cancelled");
 
             if (slotExists)
                 return BadRequest("This slot is already booked.");
 
-            // ⭐ Default values
             booking.PaymentStatus = "Pending";
             booking.PaymentMethod = "Not Selected";
 
@@ -90,37 +97,30 @@ namespace GameBookingAPI.Controllers
         }
 
         // =========================================================
-        // BOOKING HISTORY (LATEST FIRST ⭐ UPDATED)
+        // BOOKING HISTORY (LATEST FIRST)
         // =========================================================
         [HttpGet("history/{userId}")]
         public IActionResult GetBookingHistory(int userId)
         {
             var history = _context.Bookings
                 .Where(b => b.UserId == userId)
-
-                // ⭐ IMPORTANT — NEWEST BOOKING FIRST
                 .OrderByDescending(b => b.BookingId)
-
                 .Select(b => new BookingHistoryDTO
                 {
                     BookingId = b.BookingId,
-
                     GameName = _context.Games
                         .Where(g => g.GameId == b.GameId)
                         .Select(g => g.GameName)
                         .FirstOrDefault(),
-
                     LocationName = _context.Locations
                         .Where(l => l.LocationId == b.LocationId)
                         .Select(l => l.LocationName)
                         .FirstOrDefault(),
-
                     BookingDate = b.BookingDate,
                     TimeSlot = b.TimeSlot,
                     TotalAmount = b.TotalAmount,
                     PaymentStatus = b.PaymentStatus,
                     PaymentMethod = b.PaymentMethod,
-
                     Foods = _context.BookingFoods
                         .Where(bf => bf.BookingId == b.BookingId)
                         .Select(bf => new FoodDTO
@@ -135,6 +135,29 @@ namespace GameBookingAPI.Controllers
                 .ToList();
 
             return Ok(history);
+        }
+
+        // =========================================================
+        // ✅ CANCEL BOOKING (NEW API ADDED)
+        // =========================================================
+        [HttpPut("cancel/{id}")]
+        public IActionResult CancelBooking(int id)
+        {
+            var booking = _context.Bookings.FirstOrDefault(b => b.BookingId == id);
+
+            if (booking == null)
+                return NotFound("Booking not found");
+
+            // Prevent cancelling past bookings
+            if (booking.BookingDate.Date < DateTime.Today)
+                return BadRequest("Cannot cancel past bookings");
+
+            // Mark as cancelled (soft delete)
+            booking.PaymentStatus = "Cancelled";
+
+            _context.SaveChanges();
+
+            return Ok(new { message = "Booking cancelled successfully" });
         }
     }
 }

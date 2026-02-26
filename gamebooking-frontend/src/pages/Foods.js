@@ -16,6 +16,14 @@ function Foods() {
   const [user, setUser] = useState(null);
   const [authenticated, setAuthenticated] = useState(false);
 
+  // Load saved foods from localStorage on component mount
+  useEffect(() => {
+    const savedFoods = localStorage.getItem("selectedFoods");
+    if (savedFoods) {
+      setSelectedFoods(JSON.parse(savedFoods));
+    }
+  }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchFoods();
@@ -81,6 +89,7 @@ function Foods() {
         <div className="nav-links">
           <button onClick={() => navigate("/")}>Home</button>
           <button onClick={() => navigate("/dashboard")}>Games</button>
+          <button onClick={() => navigate("/history")}>My Bookings</button>
 
           {authenticated && user ? (
             <span className="user-welcome">Hello, {user.name}!</span>

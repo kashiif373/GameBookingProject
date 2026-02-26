@@ -6,30 +6,26 @@ import { useNavigate } from "react-router-dom";
 
 function Payment() {
   const navigate = useNavigate();
+
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState("");
   const [user, setUser] = useState(null);
   const [authenticated, setAuthenticated] = useState(false);
 
-  const bookingId = localStorage.getItem("bookingId");
+  const pendingBooking = JSON.parse(localStorage.getItem("pendingBooking"));
   const totalAmount = localStorage.getItem("totalAmount");
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    checkAuth();
+
+    const auth = isAuthenticated();
+    setAuthenticated(auth);
+    if (auth) setUser(getUserInfo());
+
     loadRazorpay();
   }, []);
 
-  const checkAuth = () => {
-    const auth = isAuthenticated();
-    setAuthenticated(auth);
-    if (auth) {
-      setUser(getUserInfo());
-    }
-  };
-
-  // Load Razorpay script once
   const loadRazorpay = () => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -37,161 +33,149 @@ function Payment() {
     document.body.appendChild(script);
   };
 
+  // ================= CREATE BOOKING SAFELY =================
+  const createBookingIfNeeded = async () => {
+    let bookingId = localStorage.getItem("bookingId");
 
-  // Handle Pay on Location
+    // ⭐ Already exists → reuse
+    if (bookingId) return bookingId;
+
+    // ⭐ Create new booking
+    if (pendingBooking) {
+      const res = await API.post("/Bookings", pendingBooking);
+      const saved = res.data;
+      bookingId = saved.bookingId || saved.id;
+
+      localStorage.setItem("bookingId", bookingId);
+
+      // Add foods
+      if (pendingBooking.selectedFoods) {
+        for (const [foodId, qty] of Object.entries(
+          pendingBooking.selectedFoods
+        )) {
+          if (qty > 0) {
+            await API.post("/BookingFoods", {
+              bookingId: bookingId,
+              foodId: Number(foodId),
+              quantity: qty,
+            });
+          }
+        }
+      }
+    }
+
+    return bookingId;
+  };
+
+  // ================= CLEAR STORAGE =================
+  const clearBookingData = () => {
+    localStorage.removeItem("bookingId");
+    localStorage.removeItem("pendingBooking");
+    localStorage.removeItem("totalAmount");
+    localStorage.removeItem("selectedGame");
+    localStorage.removeItem("selectedLocation");
+    localStorage.removeItem("selectedDate");
+    localStorage.removeItem("selectedTimeSlot");
+    localStorage.removeItem("selectedFoods");
+  };
+
+  // ================= PAY ON LOCATION =================
   const handlePayOnLocation = async () => {
     setLoading(true);
-    setMessage("");
-    setSelectedMethod("payOnLocation");
+    setSelectedMethod("location");
 
     try {
-      // Update booking status to indicate pay on location
+      const bookingId = await createBookingIfNeeded();
+
       await API.put(`/Bookings/${bookingId}`, {
         PaymentStatus: "Pending",
-        PaymentMethod: "PayOnLocation"
+        PaymentMethod: "PayOnLocation",
       });
 
-      setMessage("✅ Booking confirmed! Pay on location when you arrive.");
-      
-      // Clear booking data from localStorage
-      localStorage.removeItem("bookingId");
-      localStorage.removeItem("totalAmount");
-      localStorage.removeItem("selectedGame");
-      localStorage.removeItem("selectedLocation");
-      localStorage.removeItem("selectedDate");
-      localStorage.removeItem("selectedTimeSlot");
+      setMessage("✅ Booking confirmed! Pay on location.");
+      clearBookingData();
 
-      // Redirect to home page after short delay
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
-    } catch (error) {
-      console.error("Pay on Location error:", error);
-      setMessage("❌ Failed to confirm booking. Please try again.");
+      setTimeout(() => navigate("/"), 2000);
+    } catch {
+      setMessage("❌ Failed to confirm booking.");
     }
 
     setLoading(false);
   };
 
-  // Handle Pay Later
+  // ================= PAY LATER =================
   const handlePayLater = async () => {
     setLoading(true);
-    setMessage("");
-    setSelectedMethod("payLater");
+    setSelectedMethod("later");
 
     try {
-      // Update booking status to indicate pay later
+      const bookingId = await createBookingIfNeeded();
+
       await API.put(`/Bookings/${bookingId}`, {
         PaymentStatus: "Pending",
-        PaymentMethod: "PayLater"
+        PaymentMethod: "PayLater",
       });
 
       setMessage("✅ Booking confirmed! You can pay later.");
-      
-      // Clear booking data from localStorage
-      localStorage.removeItem("bookingId");
-      localStorage.removeItem("totalAmount");
-      localStorage.removeItem("selectedGame");
-      localStorage.removeItem("selectedLocation");
-      localStorage.removeItem("selectedDate");
-      localStorage.removeItem("selectedTimeSlot");
+      clearBookingData();
 
-      // Redirect to home page after short delay
-      setTimeout(() => {
-        navigate("/");
-      }, 2000);
-    } catch (error) {
-      console.error("Pay Later error:", error);
-      setMessage("❌ Failed to confirm booking. Please try again.");
+      setTimeout(() => navigate("/"), 2000);
+    } catch {
+      setMessage("❌ Failed to confirm booking.");
     }
 
     setLoading(false);
   };
 
-  // Initialize Razorpay payment (Pay Now)
-  const initializePayment = async () => {
+  // ================= PAY NOW (RAZORPAY) =================
+  const handlePayNow = async () => {
     setLoading(true);
-    setMessage("");
-    setSelectedMethod("payNow");
+    setSelectedMethod("online");
 
     try {
-      // Call backend to create order
+      const bookingId = await createBookingIfNeeded();
+
       const orderRes = await API.post(`/Payments/create-order/${bookingId}`);
+      const { orderId, keyId, amount } = orderRes.data;
 
-      const { orderId, keyId, amount, totalAmount: orderTotalAmount } = orderRes.data;
-
-      // Ensure Razorpay loaded
-      if (!window.Razorpay) {
-        setMessage("❌ Razorpay SDK not loaded. Refresh page.");
-        setLoading(false);
-        return;
-      }
-
-      // Razorpay options
       const options = {
         key: keyId,
         amount: amount,
         currency: "INR",
-        name: "Game Booking",
+        name: "Playeato",
         description: `Booking #${bookingId}`,
         order_id: orderId,
 
         handler: async function (response) {
-          try {
-            // Verify payment with backend
-            const verifyRes = await API.post(`/Payments/verify/${bookingId}`, {
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature,
-            });
+          await API.post(`/Payments/verify/${bookingId}`, {
+            razorpayOrderId: response.razorpay_order_id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpaySignature: response.razorpay_signature,
+          });
 
-            if (verifyRes.data.status === "Paid") {
-              setMessage("✅ Payment Successful!");
-              localStorage.setItem("paymentAmount", orderTotalAmount);
+          setMessage("✅ Payment Successful!");
+          clearBookingData();
 
-              // Clear booking data from localStorage
-              localStorage.removeItem("bookingId");
-              localStorage.removeItem("totalAmount");
-              localStorage.removeItem("selectedGame");
-              localStorage.removeItem("selectedLocation");
-              localStorage.removeItem("selectedDate");
-              localStorage.removeItem("selectedTimeSlot");
-
-              // Redirect to home page instead of payment-success
-              setTimeout(() => {
-                navigate("/");
-              }, 1500);
-            }
-          } catch (error) {
-            console.error("Verification error:", error);
-            setMessage("❌ Payment verification failed.");
-          }
+          setTimeout(() => navigate("/"), 1500);
         },
 
-        prefill: {
-          name: localStorage.getItem("userName") || "Customer",
-          email: localStorage.getItem("userEmail") || "test@gmail.com",
-          contact: localStorage.getItem("userPhone") || "9999999999",
+        modal: {
+          ondismiss: function () {
+            setLoading(false);
+            setSelectedMethod("");
+            setMessage("❌ Payment cancelled. Choose another method.");
+          },
         },
 
         theme: {
           color: "#4CAF50",
         },
-
-        modal: {
-          ondismiss: () => {
-            setLoading(false);
-            setMessage("❌ Payment cancelled");
-          },
-        },
       };
 
       const rzp = new window.Razorpay(options);
       rzp.open();
-
-    } catch (error) {
-      console.error("Payment error:", error);
-      setMessage("❌ Failed to initialize payment");
+    } catch {
+      setMessage("❌ Payment failed.");
     }
 
     setLoading(false);
@@ -199,25 +183,6 @@ function Payment() {
 
   return (
     <div className="payment-page">
-
-      {/* ===== NAVBAR ===== */}
-      <nav className="navbar">
-        <div className="nav-logo">Playeato</div>
-
-        <div className="nav-links">
-          <button onClick={() => navigate("/")}>Home</button>
-          <button onClick={() => navigate("/dashboard")}>Games</button>
-
-          {authenticated && user ? (
-            <>
-              <span className="user-welcome">Hello, {user.name}!</span>
-            </>
-          ) : (
-            <button onClick={() => navigate("/login")}>Login</button>
-          )}
-        </div>
-      </nav>
-
       <div className="payment-content">
         <div className="payment-wrapper">
           <div className="payment-card">
@@ -225,26 +190,22 @@ function Payment() {
 
             <div className="payment-details">
               <div className="detail-row">
-                <span className="detail-label">Booking ID</span>
-                <span className="detail-value">#{bookingId}</span>
-              </div>
-              <div className="detail-row">
-                <span className="detail-label">Amount to Pay</span>
-                <span className="detail-value amount">₹{totalAmount}</span>
+                <span>Amount</span>
+                <span className="amount">₹{totalAmount}</span>
               </div>
             </div>
 
             <div className="payment-options">
               <button
-                className={`payment-btn pay-now-btn ${selectedMethod === 'payNow' ? 'selected' : ''}`}
-                onClick={initializePayment}
+                className="payment-btn"
+                onClick={handlePayNow}
                 disabled={loading}
               >
-                💳 Pay Now (Online)
+                💳 Pay Now
               </button>
 
               <button
-                className={`payment-btn pay-location-btn ${selectedMethod === 'payOnLocation' ? 'selected' : ''}`}
+                className="payment-btn"
                 onClick={handlePayOnLocation}
                 disabled={loading}
               >
@@ -252,7 +213,7 @@ function Payment() {
               </button>
 
               <button
-                className={`payment-btn pay-later-btn ${selectedMethod === 'payLater' ? 'selected' : ''}`}
+                className="payment-btn"
                 onClick={handlePayLater}
                 disabled={loading}
               >
@@ -261,20 +222,9 @@ function Payment() {
             </div>
 
             {message && <div className="payment-message">{message}</div>}
-
-            <p className="payment-secure">
-              🔒 Secure payments via Razorpay
-            </p>
           </div>
         </div>
       </div>
-
-      {/* ===== FOOTER ===== */}
-      <footer className="footer">
-        <p>© 2026 GameZone Booking System</p>
-        <p>All rights reserved.</p>
-      </footer>
-
     </div>
   );
 }

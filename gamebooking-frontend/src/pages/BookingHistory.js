@@ -4,6 +4,13 @@ import { getUserInfo } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import "./BookingHistory.css";
 
+/* ⭐ SLOT TIME MAP */
+const slotTimeMap = {
+  Morning: "Morning (6:00 AM – 12:00 PM)",
+  Afternoon: "Afternoon (12:00 PM – 6:00 PM)",
+  Evening: "Evening (6:00 PM – 11:00 PM)"
+};
+
 function BookingHistory() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,21 +24,14 @@ function BookingHistory() {
       navigate("/login");
       return;
     }
-
     fetchBookings();
   }, []);
 
   const fetchBookings = async () => {
     try {
       const res = await API.get(`/bookings/history/${userId}`);
-
-      // ⭐ IMPORTANT: Sort newest first (fallback safety)
-      const sorted = res.data.sort(
-        (a, b) => new Date(b.bookingDate) - new Date(a.bookingDate)
-      );
-
+      const sorted = res.data.sort((a, b) => b.bookingId - a.bookingId);
       setBookings(sorted);
-
     } catch (error) {
       console.error(error);
       alert("Failed to load bookings");
@@ -40,8 +40,32 @@ function BookingHistory() {
     }
   };
 
+  const cancelBooking = async (bookingId) => {
+    if (!window.confirm("Are you sure you want to cancel this booking?"))
+      return;
+
+    try {
+      await API.put(`/bookings/cancel/${bookingId}`);
+      alert("Booking cancelled successfully");
+      fetchBookings();
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data || "Failed to cancel booking");
+    }
+  };
+
   return (
     <div className="history-page">
+
+      {/* BACK BUTTON */}
+      <button
+        className="back-btn"
+        style={{ marginBottom: "20px" }}
+        onClick={() => navigate("/dashboard")}
+      >
+        ← Go Back
+      </button>
+
       <h2 className="history-title">📜 My Booking History</h2>
 
       {loading ? (
@@ -59,48 +83,81 @@ function BookingHistory() {
         </div>
       ) : (
         <div className="history-container">
-          {bookings.map((b) => (
-            <div key={b.bookingId} className="history-card">
-              <h3>Booking ID: {b.bookingId}</h3>
+          {bookings.map((b) => {
+            const isCancelled = b.paymentStatus === "Cancelled";
+            const isPast = new Date(b.bookingDate) < new Date();
 
-              <p><strong>Game:</strong> {b.gameName}</p>
-              <p><strong>Location:</strong> {b.locationName}</p>
+            return (
+              <div key={b.bookingId} className="history-card">
 
-              <p>
-                <strong>Date:</strong>{" "}
-                {new Date(b.bookingDate).toLocaleDateString()}
-              </p>
+                <h3>Booking ID: {b.bookingId}</h3>
 
-              <p><strong>Time Slot:</strong> {b.timeSlot}</p>
-              <p><strong>Total Amount:</strong> ₹{b.totalAmount}</p>
+                <p><strong>Game:</strong> {b.gameName}</p>
+                <p><strong>Location:</strong> {b.locationName}</p>
 
-              <p>
-                <strong>Status:</strong>{" "}
-                <span className={`status ${b.paymentStatus}`}>
-                  {b.paymentStatus}
-                </span>
-              </p>
+                <p>
+                  <strong>Date:</strong>{" "}
+                  {new Date(b.bookingDate).toLocaleDateString()}
+                </p>
 
-              {b.foods && b.foods.length > 0 && (
-                <div className="food-history">
-                  <strong>Foods Ordered:</strong>
-                  <ul>
-                    {b.foods.map((f, index) => (
-                      <li key={index}>
-                        {f.foodName} (x{f.quantity})
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          ))}
+                <p>
+                  <strong>Time Slot:</strong>{" "}
+                  {slotTimeMap[b.timeSlot] || b.timeSlot}
+                </p>
+
+                <p><strong>Total Amount:</strong> ₹{b.totalAmount}</p>
+
+                <p>
+                  <strong>Status:</strong>{" "}
+                  <span className={`status ${b.paymentStatus}`}>
+                    {b.paymentStatus}
+                  </span>
+                </p>
+
+                {/* ⭐⭐⭐ NEW PAYMENT METHOD ADDED ⭐⭐⭐ */}
+                <p>
+                  <strong>Payment Method:</strong>{" "}
+                  {b.paymentMethod === "PayNow" && "💳 Online Payment"}
+                  {b.paymentMethod === "PayLater" && "🕐 Pay Later"}
+                  {b.paymentMethod === "PayOnLocation" && "📍 Pay on Location"}
+                  {!b.paymentMethod && "Not Selected"}
+                </p>
+
+                {b.foods && b.foods.length > 0 && (
+                  <div className="food-history">
+                    <strong>Foods Ordered:</strong>
+                    <ul>
+                      {b.foods.map((f, index) => (
+                        <li key={index}>
+                          {f.foodName} (x{f.quantity})
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {!isCancelled && !isPast && (
+                  <button
+                    className="cancel-btn"
+                    onClick={() => cancelBooking(b.bookingId)}
+                  >
+                    Cancel Booking
+                  </button>
+                )}
+
+                {isCancelled && (
+                  <p className="cancelled-text">❌ Booking Cancelled</p>
+                )}
+
+                {isPast && !isCancelled && (
+                  <p className="expired-text">⏳ Completed Booking</p>
+                )}
+
+              </div>
+            );
+          })}
         </div>
       )}
-
-      <button className="back-btn" onClick={() => navigate("/dashboard")}>
-        ← Back
-      </button>
     </div>
   );
 }

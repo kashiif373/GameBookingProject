@@ -63,6 +63,7 @@ function Dashboard() {
         <div className="nav-links">
           <button onClick={() => navigate("/")}>Home</button>
           <button onClick={() => navigate("/dashboard")}>Games</button>
+          <button onClick={() => navigate("/history")}>My Bookings</button>
 
           {authenticated && user ? (
             <>

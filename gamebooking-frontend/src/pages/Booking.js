@@ -23,7 +23,7 @@ function Booking() {
 
   const allSlots = ["Morning", "Afternoon", "Evening"];
 
-  // LOCAL DATE FIX
+  // ================= DATE HELPERS =================
   const getTodayDate = () => {
     const today = new Date();
     const offset = today.getTimezoneOffset();
@@ -31,120 +31,120 @@ function Booking() {
     return localDate.toISOString().split("T")[0];
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  const getMaxDate = () => {
+    const today = new Date();
+    const maxDate = new Date(today.setDate(today.getDate() + 90));
+    const offset = maxDate.getTimezoneOffset();
+    const localDate = new Date(maxDate.getTime() - offset * 60000);
+    return localDate.toISOString().split("T")[0];
+  };
 
+  // ================= LOAD DATA =================
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const gameRes = await API.get("/Games");
+        setGame(gameRes.data.find(g => g.gameId === Number(gameId)));
+
+        const locRes = await API.get(`/Locations/${gameId}`);
+        setLocation(locRes.data.find(l => l.locationId === Number(locationId)));
+
+        const foodRes = await API.get("/Foods");
+        setFoods(foodRes.data);
+
+        const storedFoods = JSON.parse(localStorage.getItem("selectedFoods")) || {};
+        setSelectedFoods(storedFoods);
+
+      } catch {
+        alert("Error loading booking data");
+      }
+    };
+
+    loadData();
+  }, [gameId, locationId]);
+
+  // ================= CALCULATE TOTAL =================
   useEffect(() => {
     if (location && foods) {
-      calculateTotal(location.pricePerHour, foods, selectedFoods);
+      let totalAmount = Number(location.pricePerHour || 0);
+
+      foods.forEach(food => {
+        if (selectedFoods[food.foodId] > 0) {
+          totalAmount += food.price * selectedFoods[food.foodId];
+        }
+      });
+
+      setTotal(totalAmount);
+      localStorage.setItem("totalAmount", totalAmount);
     }
   }, [location, foods, selectedFoods]);
 
-  // LOAD ALL DATA
-  const loadData = async () => {
-    try {
-      // GAME
-      const gameRes = await API.get("/Games");
-      const selectedGame = gameRes.data.find(g => g.gameId == gameId);
-      setGame(selectedGame);
-
-      // LOCATION
-      const locRes = await API.get(`/Locations/${gameId}`);
-      const selectedLoc = locRes.data.find(l => l.locationId == locationId);
-      setLocation(selectedLoc);
-
-      // FOODS
-      const foodRes = await API.get("/Foods");
-      setFoods(foodRes.data);
-
-      const storedFoods =
-        JSON.parse(localStorage.getItem("selectedFoods")) || {};
-      setSelectedFoods(storedFoods);
-
-    } catch {
-      alert("Error loading booking data");
-    }
-  };
-
-  // TOTAL CALCULATION
-  const calculateTotal = (locPrice, foodsList, selected) => {
-    let totalAmount = Number(locPrice);
-
-    foodsList.forEach(food => {
-      if (selected[food.foodId] > 0) {
-        totalAmount += food.price * selected[food.foodId];
-      }
-    });
-
-    setTotal(totalAmount);
-  };
-
-  // FETCH BOOKED SLOTS
+  // ================= FETCH BOOKED SLOTS =================
   const fetchBookedSlots = async (date, locId) => {
     try {
-      const res = await API.get(
-        `/Bookings/slots?locationId=${locId}&date=${date}`
+      const res = await API.get(`/Bookings/slots?locationId=${locId}&date=${date}`);
+      const normalized = res.data.map(slot =>
+        typeof slot === "string" ? slot : slot.timeSlot
       );
-
-      const normalized = res.data.map(slot => {
-        let value = typeof slot === "string" ? slot : slot.timeSlot;
-        return value.trim().split(" ")[0];
-      });
-
       setBookedSlots(normalized);
       setTimeSlot("");
-
     } catch {
       console.log("Error loading slots");
     }
   };
 
-  // FILTER AVAILABLE SLOTS
-  const availableSlots = allSlots.filter(
-    slot => !bookedSlots.includes(slot)
-  );
+  // ================= TIME-BASED SLOT FILTER =================
+  const getTimeBasedAvailableSlots = () => {
+    const today = getTodayDate();
 
-  // CONFIRM BOOKING
-  const confirmBooking = async () => {
+    if (bookingDate !== today) {
+      return allSlots.filter(slot => !bookedSlots.includes(slot));
+    }
+
+    const hour = new Date().getHours();
+
+    return allSlots.filter(slot => {
+      if (bookedSlots.includes(slot)) return false;
+      if (slot === "Morning" && hour >= 12) return false;
+      if (slot === "Afternoon" && hour >= 18) return false;
+      if (slot === "Evening" && hour >= 23) return false;
+      return true;
+    });
+  };
+
+  const availableSlots = getTimeBasedAvailableSlots();
+
+  // ================= CONFIRM BOOKING =================
+  const confirmBooking = () => {
     if (!bookingDate || !timeSlot) {
       alert("Please select date & slot");
       return;
     }
 
-    if (bookingDate < getTodayDate()) {
-      alert("Cannot book past date");
+    if (!userId) {
+      navigate("/login");
       return;
     }
 
-    try {
-      const bookingData = {
-        userId: Number(userId),
-        gameId: Number(gameId),
-        locationId: Number(locationId),
-        bookingDate: new Date(bookingDate + "T00:00:00").toISOString(),
-        timeSlot,
-        totalAmount: total,
-        paymentStatus: "Pending",
-        paymentMethod: "Online"
-      };
+    const bookingData = {
+      userId: Number(userId),
+      gameId: Number(gameId),
+      locationId: Number(locationId),
+      bookingDate,
+      timeSlot,
+      totalAmount: total,
+      selectedFoods,
+    };
 
-      const res = await API.post("/Bookings", bookingData);
+    localStorage.setItem("pendingBooking", JSON.stringify(bookingData));
+    localStorage.setItem("totalAmount", total);
 
-      localStorage.setItem("bookingId", res.data.bookingId);
-      localStorage.setItem("totalAmount", total);
-
-      navigate("/payment");
-
-    } catch {
-      alert("Booking failed");
-    }
+    navigate("/payment");
   };
 
+  // ================= UI =================
   return (
     <div className="booking-page">
-
-      {/* NAVBAR */}
       <nav className="navbar">
         <div className="nav-logo">Playeato</div>
       </nav>
@@ -158,19 +158,15 @@ function Booking() {
             {/* GAME */}
             {game && (
               <div className="summary-section">
-                <h4>🎮 Game</h4>
-                <div className="summary-item">
-                  <span>{game.gameName}</span>
-                </div>
+                <h4>🎮 Selected Game</h4>
+                <div className="summary-item">{game.gameName}</div>
               </div>
             )}
-
-            <div className="summary-divider"></div>
 
             {/* LOCATION */}
             {location && (
               <div className="summary-section">
-                <h4>📍 Location</h4>
+                <h4>📍 Selected Location</h4>
                 <div className="summary-item">
                   <span>{location.locationName}</span>
                   <span className="price">₹{location.pricePerHour}</span>
@@ -178,29 +174,33 @@ function Booking() {
               </div>
             )}
 
-            <div className="summary-divider"></div>
-
             {/* FOODS */}
             <div className="summary-section">
-              <h4>🍕 Selected Foods</h4>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <h4>🍕 Selected Foods</h4>
+                <button
+                  className="add-more-foods-btn"
+                  onClick={() => navigate("/foods")}
+                >
+                  + Add More Foods
+                </button>
+              </div>
 
               {foods.filter(f => selectedFoods[f.foodId] > 0).length === 0 ? (
                 <p className="no-foods">No food selected</p>
               ) : (
-                foods.map(
-                  food =>
-                    selectedFoods[food.foodId] > 0 && (
-                      <div key={food.foodId} className="food-item">
-                        {food.foodName} x {selectedFoods[food.foodId]}
-                      </div>
-                    )
+                foods.map(food =>
+                  selectedFoods[food.foodId] > 0 && (
+                    <div key={food.foodId} className="food-item">
+                      <span>{food.foodName} × {selectedFoods[food.foodId]}</span>
+                      <span>₹{food.price * selectedFoods[food.foodId]}</span>
+                    </div>
+                  )
                 )
               )}
             </div>
 
-            <div className="summary-divider"></div>
-
-            {/* DATE + SLOT */}
+            {/* DATE & SLOT */}
             <div className="summary-section">
               <h4>📅 Select Date & Slot</h4>
 
@@ -208,6 +208,7 @@ function Booking() {
                 type="date"
                 className="date-input"
                 min={getTodayDate()}
+                max={getMaxDate()}
                 value={bookingDate}
                 onChange={(e) => {
                   setBookingDate(e.target.value);
@@ -216,9 +217,7 @@ function Booking() {
               />
 
               {bookingDate && availableSlots.length === 0 ? (
-                <p className="no-slots">
-                  ❌ All slots are booked for this date
-                </p>
+                <p className="no-slots">❌ All slots unavailable for today</p>
               ) : (
                 <select
                   className="slot-select"
@@ -226,7 +225,6 @@ function Booking() {
                   onChange={(e) => setTimeSlot(e.target.value)}
                 >
                   <option value="">Select Slot</option>
-
                   {availableSlots.map(slot => (
                     <option key={slot} value={slot}>
                       {slot === "Morning" && "Morning (6AM-12PM)"}
@@ -237,8 +235,6 @@ function Booking() {
                 </select>
               )}
             </div>
-
-            <div className="summary-divider"></div>
 
             {/* TOTAL */}
             <div className="total-section">

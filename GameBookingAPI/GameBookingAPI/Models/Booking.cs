@@ -22,5 +22,6 @@ namespace GameBookingAPI.Models
         // Razorpay fields
         public string? RazorpayOrderId { get; set; }
         public string? RazorpayPaymentId { get; set; }
+        
     }
 }

@@ -187,3 +187,15 @@
     padding: 25px 20px;
   }
 }
+.forgot-link {
+  color: #00c6ff;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: right;
+  margin-top: -10px;
+  margin-bottom: 15px;
+}
+
+.forgot-link:hover {
+  text-decoration: underline;
+}
