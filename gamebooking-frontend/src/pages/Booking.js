@@ -12,7 +12,6 @@ function Booking() {
   const [foods, setFoods] = useState([]);
   const [selectedFoods, setSelectedFoods] = useState({});
   const [total, setTotal] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const [bookingDate, setBookingDate] = useState("");
   const [timeSlot, setTimeSlot] = useState("");
@@ -147,27 +146,6 @@ function Booking() {
   // ================= UI =================
   return (
     <div className="booking-page">
-      <nav className="navbar">
-        <div className="nav-logo" onClick={() => navigate("/")}>Playeato</div>
-
-        {/* Hamburger Menu Button */}
-        <button 
-          className={`hamburger ${menuOpen ? 'active' : ''}`}
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-        <div className={`nav-links ${menuOpen ? 'active' : ''}`}>
-          <button onClick={() => { navigate("/"); setMenuOpen(false); }}>Home</button>
-          <button onClick={() => { navigate("/dashboard"); setMenuOpen(false); }}>Games</button>
-          <button onClick={() => { navigate("/history"); setMenuOpen(false); }}>My Bookings</button>
-        </div>
-      </nav>
-
       <div className="booking-content">
         <div className="booking-container">
           <h2 className="booking-title">Booking Summary</h2>

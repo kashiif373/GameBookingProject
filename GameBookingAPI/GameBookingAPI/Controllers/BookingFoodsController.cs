@@ -16,7 +16,7 @@ namespace GameBookingAPI.Controllers
             _context = context;
         }
 
-        // ADD FOOD TO BOOKING
+        // ADD FOOD TO BOOKING 
         [HttpPost]
         public IActionResult AddFoodToBooking(BookingFood bookingFood)
         {
